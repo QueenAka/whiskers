@@ -1,0 +1,475 @@
+:root {
+  --p: #1e2124;
+  --s: #26292e;
+  --t: #f1f1f1;
+  --lt: #aaaaaa;
+  --b: #131517;
+  --sp: #13ecaf;
+}
+
+::-moz-selection {
+  color: var(--t);
+  background: var(--sp);
+  opacity: 0.9;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+::selection {
+  color: var(--t);
+  background: var(--sp);
+  opacity: 0.9;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+* {
+  margin: auto;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.1s ease-in-out;
+  outline: none;
+  scroll-behavior: smooth;
+  color: var(--t);
+  user-select: none;
+}
+
+reply {
+  font-size: 12px;
+  marin-bottom: 1px;
+  color: var(--sp);
+}
+
+html {
+  height: 100%;
+  width: 100%;
+  background-color: var(--p);
+  overflow-x: hidden;
+}
+
+button {
+  background-color: var(--sp);
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  min-width: 75px;
+  font-weight: bold;
+  color: var(--t);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+input[type=text], input[type=color], select, option, input[type=password] {
+  background-color: var(--s);
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  width: 200px;
+  font-weight: bold;
+  margin: 5px;
+  color: var(--t);
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--sp);
+  color: var(--t);
+}
+
+nav {
+  height: 50px;
+  width: 100%;
+  background-color: var(--sp);
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  z-index: 999;
+  color: var(--t);
+}
+
+#home {
+  margin: 0;
+  width: 120px;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  display: flex;
+  color: var(--t);
+}
+
+nav a:hover {
+  opacity: 0.8;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--t);
+}
+
+.lined {
+  text-align: center;
+  position: relative;
+  font-size: 30px;
+  background-color: var(--p);
+  width: fit-content;
+  padding: 10px;
+  font-weight: bold;
+  color: var(--t);
+}
+
+.lined::after {
+  content: '';
+  display: block;
+  width: 100vw;
+  height: 3px;
+  background-color: var(--t);
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -1;
+  color: var(--t);
+}
+
+.center {
+  margin-top: 100px;
+  color: var(--t);
+}
+
+.user {
+  position: fixed;
+  left: 10px;
+  color: var(--t);
+}
+
+.settings {
+  position: fixed;
+  right: 10px;
+  color: var(--t);
+}
+
+.logo {
+  width: 30px;
+  height: 30px;
+  margin: 5px;
+  color: var(--t);
+}
+
+.bottom-nav {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  background-color: var(--b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t);
+  z-index: 99999999999999;
+  border-top: 2px solid var(--sp);
+}
+
+#msginp {
+  width: calc(100% - 137.5px);
+  height: 20px;
+  color: var(--t);
+  border-radius: 5px;
+}
+
+#imageGetter {
+  display: none;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+  color: var(--t);
+  background: var(--sp);
+  border-radius: 5px;
+}
+
+.icon:active {
+  transform: scale(0.95);
+}
+
+.userImg {
+  max-width: 300px;
+  border-radius: 10px;
+}
+
+#log {
+  height: calc(100vh - 102px);
+  width: 100vw;
+  margin-top: 50px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.msg, .msgr {
+  padding: 0px 5px;
+  margin: 0;
+  width: calc(100% - 5px);
+  display: block;
+  overflow-wrap: break-word;
+  cursor: normal;
+  word-break: break-all;
+  white-space: normal;
+  position: relative;
+  height: fit-content;
+  vertical-align: center;
+  color: var(--t);
+}
+
+.top {
+  margin-top: 5px;
+}
+
+
+.msg:hover, .msgr:hover {
+  background-color: var(--b);
+}
+
+a {
+  color: var(--sp);
+}
+
+.lt {
+  color: var(--lt);
+}
+
+spoiler {
+  background-color: var(--t);
+  padding: 2px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+spoiler[clicked=true]{
+  background-color: transparent;
+}
+
+.none {
+  display: none;
+}
+
+.sttn {
+  width: 300px;
+  position: absolute;
+  left: 50%;
+  top: 60px;
+  transform: translateX(-50%);
+}
+
+.lgin {
+  width: 300px;
+  position: absolute;
+  left: 50%;
+  top: 100px;
+  transform: translateX(-50%);
+}
+
+.lgin button {
+  width: calc(50% - 3px);
+  margin: 0;
+}
+
+.sttn input, .sttn select, .lgin input {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.lgin input {
+  width: calc(100% - 12px);
+}
+
+.emoji {
+  width: 25px;
+  height: 25px;
+  margin: 0;
+  vertical-align: center;
+}
+
+.emoji:active {
+  transform: scale(1.1);
+}
+
+.msgr:hover::after {
+  content: "Reply";
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  border: none;
+  height: 20px;
+  width: 45px;
+  background: var(--p);
+  border-radius: 5px 5px 0 0;
+  padding: 1px 5px;
+  border-left: 2px solid var(--t);
+  border-top: 2px solid var(--t);
+  border-right: 2px solid var(--t);
+  text-align: center;
+  color: var(--t);
+}
+
+.msgr:hover::before {
+  content: "Copy";
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  border: none;
+  height: 20px;
+  width: 45px;
+  background: var(--p);
+  border-radius: 0 0 5px 5px;
+  padding: 1px 5px;
+  border-left: 2px solid var(--t);
+  border-bottom: 2px solid var(--t);
+  text-align: center;
+  border-right: 2px solid var(--t);
+  color: var(--t);
+  z-index: 99;
+}
+
+.reply {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  border: none;
+  height: 20px;
+  width: 45px;
+  background: var(--p);
+  border-radius: 5px 5px 0 0;
+  padding: 1px 5px;
+  border-left: 2px solid var(--t);
+  border-top: 2px solid var(--t);
+  border-right: 2px solid var(--t);
+  text-align: center;
+  z-index: 99;
+  opacity: 0;
+  user-select: none;
+  color: var(--t);
+}
+
+.copy {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  border: none;
+  height: 20px;
+  width: 45px;
+  background: var(--p);
+  border-radius: 0 0 5px 5px;
+  padding: 1px 5px;
+  border-left: 2px solid var(--t);
+  border-bottom: 2px solid var(--t);
+  text-align: center;
+  z-index: 99;
+  opacity: 0;
+  user-select: none;
+  color: var(--t);
+}
+
+.notif {
+  position: fixed;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 75px;
+  max-width: 275px;
+  min-height: 30px;
+  max-height: 100px;
+  background-color: var(--p);
+  display: flex;
+  align-items: center;
+  color: var(--t);
+  justify-content: center;
+  font-weight: bold;
+  z-index: 999;
+  border: 2px solid var(--sp);
+  animation: fadein 0.1s;
+  padding: 2.5px 5px;
+  border-radius: 5px;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.emoji-chooser {
+  position: fixed;
+  bottom: 50px;
+  right: 0px;
+  background-color: var(--b);
+  height: 120px;
+  width: 200px;
+  border-radius: 10px 0 0 0;
+  overflow: auto;
+  animation: swipeup 0.2s ease-out;
+  border-top: 2px solid var(--sp);
+  border-left: 2px solid var(--sp);
+  scrollbar-width: none;
+  z-index: 99999999999;
+}
+
+.list-item {
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+}
+
+.list-item:hover {
+  background: var(--p);
+}
+
+.list-item:active {
+  width: 25px;
+  height: 25px;
+  padding: 7.4px;
+}
+
+@keyframes swipeup {
+  from {
+    bottom: -200px;
+  } to {
+    bottom: 50px;
+  }
+}
+
+.nav-emoji-picker::before {
+  content: "";
+  width: 200px;
+  position: absolute;
+  top: -2px;
+  right: 0;
+  height: 2px;
+  background: var(--b);
+  z-index: 999999999999999;
+}
+
+@keyframes swipedown {
+  from {
+    bottom: 50px;
+  } to {
+    bottom: -200px;
+  }
+}
+
+a {
+  margin: 0;
+}
+
+reply {
+  margin: 0;
+}

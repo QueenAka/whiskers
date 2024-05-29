@@ -1,0 +1,336 @@
+let lastUser = null;
+let client = null;
+
+function goto(url) {
+  window.location.href = url;
+}
+
+const settings = JSON.parse(localStorage.getItem("userData"));
+if (settings == null) {
+  goto("/pages/user");
+}
+let uname = settings.displayName;
+
+fetch("/events/post", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    type: "chatJoin",
+    url: window.location.href,
+    data: uname,
+  }),
+})
+  .then((res) => res.json())
+  .then((data) => {
+    client = new EventSource(`/events/get?id=${data.id}`);
+    client.addEventListener("message", function (event) {
+      let message = JSON.parse(event.data);
+      if (
+        message.type == "messageCreate" &&
+        message.url == window.location.href
+      ) {
+        let msgId = Math.floor(Math.random() * 100000000000000);
+        resetTimer();
+        messageData = JSON.parse(message.data)
+        lastUser = messageData.author;
+        if(lastUser == "[SERVER]") messageData.content = clean(messageData.content)
+
+        const messages = document.getElementById("log");
+
+        const msgDiv = document.createElement("div");
+        msgDiv.classList.add("msgr");
+        msgDiv.id = `msg-${msgId}`;
+
+        const topDiv = document.createElement("div");
+        topDiv.classList.add("top");
+
+        const authorSpan = document.createElement("b");
+        authorSpan.id = msgId;
+        authorSpan.innerHTML = messageData.author;
+
+        const dateSpan = document.createElement("span");
+        dateSpan.classList.add("lt");
+        dateSpan.innerHTML = ` ${formateDate(new Date())}`;
+
+        topDiv.appendChild(authorSpan);
+        topDiv.appendChild(dateSpan);
+        topDiv.innerHTML += "<br>";
+
+        msgDiv.appendChild(topDiv);
+
+        const bottomSpan = document.createElement("span");
+        bottomSpan.innerHTML = messageData.content;
+
+        const replyDiv = document.createElement("div");
+        replyDiv.classList.add("reply");
+        replyDiv.innerHTML = "Reply";
+        replyDiv.onclick = function () {
+          reply(msgId);
+        };
+
+        const copyDiv = document.createElement("div");
+        copyDiv.classList.add("copy");
+        copyDiv.innerHTML = "Copy";
+        copyDiv.onclick = function () {
+          copy(removeReply(JSON.parse(message.data).content));
+        };
+
+        const bottomDiv = document.createElement("div");
+        bottomDiv.appendChild(bottomSpan);
+        bottomDiv.appendChild(replyDiv);
+        bottomDiv.appendChild(copyDiv);
+
+        if (lastUser === uname) {
+          msgDiv.classList.add("msgr");
+        }
+
+        msgDiv.appendChild(bottomDiv);
+
+        messages.appendChild(msgDiv);
+
+        aud = "/media/" + settings.settings.notifSound;
+        if (settings.settings.notifSounds == true) {
+          var audio = new Audio(aud);
+          audio.loop = false;
+          audio.play();
+        }
+        messages.scrollTop = messages.scrollHeight;
+      }
+    });
+  });
+
+document.getElementById("msginp").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    document.getElementById("msgsend").click();
+  }
+});
+
+allEmojis = [];
+
+fetch("/api/emojis")
+  .then((res) => res.json())
+  .then((emojis) => {
+    emojis.forEach((emoji) => {
+      allEmojis.push(emoji);
+    });
+  });
+
+let msgTimeout = setTimeout(() => {
+  lastUser = null;
+  console.log("Resetted");
+}, 60000);
+
+function removeReply(msg) {
+  const replyRegexTwo = /\<a href=\"\#.*?\"><reply>.*?\<\/reply><\/a><br>/g;
+  msg = msg.replace(replyRegexTwo, "").trim();
+  return msg;
+}
+
+function notif(txt) {
+  const notif = document.createElement("div");
+  notif.classList = "notif";
+  notif.innerHTML = txt;
+  document.body.appendChild(notif);
+  setTimeout(() => {
+    notif.style.opacity = 0;
+    setTimeout(() => {
+      notif.remove();
+    }, 125);
+  }, 1500);
+}
+
+function img() {
+  let input = document.getElementById("imageGetter");
+  input.click();
+  input.onchange = (e) => {
+    let file = e.target.files[0];
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      let html;
+      if (e.target.result.includes("video")) {
+        html = `<video class="userImg" controls><source src="${e.target.result}"></video>`;
+      } else if (e.target.result.includes("image")) {
+        html = `<img src="${e.target.result}" class="userImg"></div>`;
+      } else return notif("Invalid file type");
+      let json = {
+        type: "messageCreate",
+        data: JSON.stringify({ content: html, author: uname }),
+        url: window.location.href,
+      };
+      fetch("/events/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(json),
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+}
+
+function send() {
+  const msg = document.getElementById("msginp").value;
+  if (msg.trim().length < 1) return;
+  if (msg.trim().length > 2000) return notif("Message too long!");
+  const type = "messageCreate";
+  document.getElementById("msginp").value = "";
+  let json = {
+    type: type,
+    data: JSON.stringify({
+      content: clean(msg),
+      author: uname,
+    }),
+    url: window.location.href,
+  };
+  fetch("/events/post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(json),
+  });
+}
+
+function resetTimer() {
+  clearTimeout(msgTimeout);
+  msgTimeout = setTimeout(() => {
+    lastUser = null;
+  }, 60000);
+}
+
+function clean(msg) {
+  const emojiRegex = /:.*?:/g;
+  const linkRegex = /(https?:\/\/[^\s]+)/g;
+  const headerRegex = /^(#{1,6})\s+(.*)$/gm;
+  const replyRegex = /\{.*?\}/g;
+  const italicsRegex = /\*(.*?)\*/g;
+  const boldRegex = /\*\*(.*?)\*\*/g;
+  const strikethroughRegex = /~~(.*?)~~/g;
+  const underlineRegex = /_(.*?)_/g;
+  const spoilerRegex = /\|\|(.*?)\|\|/g;
+  const id = Math.floor(Math.random() * 100000000);
+  msg = msg.replace(/</g, "&lt;");
+  msg = msg.replace(headerRegex, function (match, p1, p2) {
+    let level = p1.length;
+    let tag = `<h${level}>${p2}</h${level}>`;
+    return tag;
+  });
+  msg = msg.replace(emojiRegex, function (name) {
+    const emoji = allEmojis.find((emoji) => emoji.name == name.slice(1, -1));
+    if (emoji) {
+      return `<img class="emoji" src="${emoji.url}" alt="${emoji.name}">`;
+    }
+    return name;
+  });
+  msg = msg.replace(linkRegex, `<a href="$1" target="_blank">$1</a>`);
+  msg = msg.replace(boldRegex, "<b>$1</b>");
+  msg = msg.replace(italicsRegex, "<i>$1</i>");
+  msg = msg.replace(strikethroughRegex, "<del>$1</del>");
+  msg = msg.replace(underlineRegex, "<u>$1</u>");
+  msg = msg.replace(
+    spoilerRegex,
+    `<spoiler onclick="show('${id}')" id="${id}" clicked="false">$1</spoiler>`,
+  );
+  msg = msg.replace(replyRegex, function (match) {
+    let msgId = match.replace("{", "").replace("}", "");
+    let doc = document.getElementById(msgId);
+    if (!doc) {
+      return match;
+    } else {
+      let txt = doc.innerHTML;
+      if (lastUser == uname) lastUser = null;
+      return `<a href="#${msgId}" onclick="highlight('${msgId}')"><reply>Replying to ${removeReply(
+        txt,
+      )}</reply></a><br>`;
+    }
+  });
+  msg = msg.replace("\\", "<span class='none'>\\</span>");
+  return msg;
+}
+
+function highlight(id) {
+  let doc = document.getElementById(`msg-${id}`);
+  doc.style.background = "var(--sp)";
+  setTimeout(() => {
+    doc.style.background = "";
+  }, 1000);
+}
+
+function show(id) {
+  document.getElementById(id).setAttribute("clicked", "true");
+}
+
+function formateDate(date) {
+  const d = new Date(date);
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+  const year = d.getFullYear();
+  const hour = d.getHours();
+  let min = d.getMinutes();
+  if (min < 10) {
+    min = "0" + min;
+  }
+  return `${month}/${day}/${year} ${hour % 12 || 12}:${min}`;
+}
+
+function reply(msg) {
+  document.getElementById("msginp").value = "{" + msg + "} ";
+  document.getElementById("msginp").focus();
+}
+
+function copy(txt) {
+  navigator.clipboard.writeText(txt);
+  notif("Copied text!");
+}
+
+function notif(txt) {
+  const notif = document.createElement("div");
+  notif.classList = "notif";
+  notif.innerHTML = txt;
+  document.body.appendChild(notif);
+  setTimeout(() => {
+    notif.style.opacity = 0;
+    setTimeout(() => {
+      notif.remove();
+    }, 125);
+  }, 1500);
+}
+
+let emojiOpened = false;
+function emoji() {
+  if (emojiOpened == false) {
+    emojiOpened = true;
+    let chooser = document.createElement("div");
+    chooser.classList = "emoji-chooser";
+    let list = "";
+    allEmojis.forEach((emoji) => {
+      list += `<img src='${emoji.url}'  class='list-item' onclick='emojiClick("${emoji.name}")'>`;
+    });
+    chooser.innerHTML = list;
+    chooser.id = "emojiChooser";
+    let nav = document.getElementById("bottom-nav");
+    document.body.appendChild(chooser);
+    setTimeout(() => {
+      nav.classList.add("nav-emoji-picker");
+    }, 50);
+  } else {
+    emojiOpened = false;
+    let chooser = document.getElementById("emojiChooser");
+    let nav = document.getElementById("bottom-nav");
+    chooser.style.animation = "swipedown 0.4s ease-out";
+    setTimeout(() => {
+      nav.classList.remove("nav-emoji-picker");
+      setTimeout(() => {
+        chooser.remove();
+      }, 75);
+    }, 125);
+  }
+}
+
+function emojiClick(name) {
+  document.getElementById("msginp").value += ":" + name + ":";
+}
