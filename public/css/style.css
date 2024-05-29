@@ -94,14 +94,9 @@ nav {
   color: var(--t);
 }
 
-#home {
-  margin: 0;
-  width: 120px;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  display: flex;
-  color: var(--t);
+nav img {
+  width: 30px;
+  height: 30px;
 }
 
 nav a:hover {
@@ -110,6 +105,16 @@ nav a:hover {
 
 nav a {
   text-decoration: none;
+  color: var(--t);
+}
+  
+#home {
+  margin: 0;
+  width: 120px;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  display: flex;
   color: var(--t);
 }
 
