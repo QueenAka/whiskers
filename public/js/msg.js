@@ -33,9 +33,10 @@ fetch("/events/post", {
       ) {
         let msgId = Math.floor(Math.random() * 100000000000000);
         resetTimer();
-        messageData = JSON.parse(message.data)
+        messageData = JSON.parse(message.data);
         lastUser = messageData.author;
-        if(lastUser == "[SERVER]") messageData.content = clean(messageData.content)
+        if (lastUser == "[SERVER]")
+          messageData.content = clean(messageData.content);
 
         const messages = document.getElementById("log");
 
@@ -90,7 +91,7 @@ fetch("/events/post", {
 
         messages.appendChild(msgDiv);
 
-        aud = "/media/" + settings.settings.notifSound;
+        aud = "/media/audio/" + settings.settings.notifSound;
         if (settings.settings.notifSounds == true) {
           var audio = new Audio(aud);
           audio.loop = false;
@@ -140,36 +141,6 @@ function notif(txt) {
       notif.remove();
     }, 125);
   }, 1500);
-}
-
-function img() {
-  let input = document.getElementById("imageGetter");
-  input.click();
-  input.onchange = (e) => {
-    let file = e.target.files[0];
-    let reader = new FileReader();
-    reader.onload = (e) => {
-      let html;
-      if (e.target.result.includes("video")) {
-        html = `<video class="userImg" controls><source src="${e.target.result}"></video>`;
-      } else if (e.target.result.includes("image")) {
-        html = `<img src="${e.target.result}" class="userImg"></div>`;
-      } else return notif("Invalid file type");
-      let json = {
-        type: "messageCreate",
-        data: JSON.stringify({ content: html, author: uname }),
-        url: window.location.href,
-      };
-      fetch("/events/post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(json),
-      });
-    };
-    reader.readAsDataURL(file);
-  };
 }
 
 function send() {

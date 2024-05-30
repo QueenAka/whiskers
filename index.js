@@ -13,7 +13,7 @@ function loadEmojis() {
   emojisList = files.map((file) => {
     return {
       name: file.split(".")[0].toLowerCase(),
-      url: `/emojis/${file}`,
+      url: `/media/image/emojis/${file}`,
       fileType: "image/" + file.split(".")[1],
     };
   });
@@ -170,10 +170,9 @@ app.get("/api/chats/:chatId", async (req, res) => {
   let data = JSON.parse(
     fs.readFileSync(path.join(__dirname, "private/data/chats.json")),
   );
-  if (!data[chatId])
-    return res.status(404).json({ error: "Chat not found" });
+  if (!data[chatId]) return res.status(404).json({ error: "Chat not found" });
   res.json(data[chatId]);
-})
+});
 
 app.get("/chats/:chatId", async (req, res) => {
   let chatId = req.params.chatId;
