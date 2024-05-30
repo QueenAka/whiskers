@@ -32,19 +32,21 @@ function goto(url) {
   window.location.href = url;
 }
 
-class GlobalVariables {
-  constructor() {}
-  get(v) {
+class DependableVariables {
+  constructor(v) {
+    if (!v) return null;
     const varAndArg = v.split(".");
     const varName = varAndArg[0];
-    const arg = varAndArg[1];
+    varAndArg.splice(0, 1);
+    const arg = varAndArg;
     this[varName](arg);
   }
+
   chat(args) {
-    if (args == "name") {
+    if (args[0] == "name") {
       const id = window.location.href.split("/chat/")[0];
       if (id) {
-        fetch(`/api/chat/${id}/settings`)
+        fetch(`/api/chats/${id}`)
           .then((res) => res.json())
           .then((data) => {
             return data.name;
@@ -52,7 +54,7 @@ class GlobalVariables {
       } else {
         return null;
       }
-    } else if (args == "owner") {
+    } else if (args[0] == "owner") {
       const id = window.location.href.split("/chat/")[0];
       if (id) {
         fetch(`/api/chat/${id}/settings`)
@@ -63,14 +65,14 @@ class GlobalVariables {
       } else {
         return null;
       }
-    } else if (args == "id") {
+    } else if (args[0] == "id") {
       const id = window.location.href.split("/chat/")[0];
       if (id) {
         return id;
       } else {
         return null;
       }
-    } else if (args == "settings") {
+    } else if (args[0] == "settings") {
       const id = window.location.href.split("/chat/")[0];
       if (id) {
         fetch(`/api/chat/${id}/settings`)

@@ -7,7 +7,9 @@ let clients = [];
 let emojisList = [];
 
 function loadEmojis() {
-  const files = fs.readdirSync(path.join(__dirname, "public/emojis"));
+  const files = fs.readdirSync(
+    path.join(__dirname, "public/media/image/emojis"),
+  );
   emojisList = files.map((file) => {
     return {
       name: file.split(".")[0].toLowerCase(),
@@ -163,16 +165,28 @@ app.post("/api/new", async (req, res) => {
   });
 });
 
+app.get("/api/chats/:chatId", async (req, res) => {
+  let chatId = req.params.chatId;
+  let data = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "private/data/chats.json")),
+  );
+  if (!data[chatId])
+    return res.status(404).json({ error: "Chat not found" });
+  res.json(data[chatId]);
+})
+
 app.get("/chats/:chatId", async (req, res) => {
   let chatId = req.params.chatId;
-  if (!chatId) return res.redirect("/404");
+  if (!chatId) return res.redirect("/");
   let chat = JSON.parse(
     fs.readFileSync(path.join(__dirname, "private/data/chats.json")),
   )[chatId];
   if (!chat) return res.status(404).redirect("/404");
-  res.send(`
-    
-  `);
+  if (chat.visibiility == "private") {
+    res.status(403).redirect(`/chats/auth/${chatId}`);
+  } else {
+    res.sendFile(path.join(__dirname, "private/html/chat.html"));
+  }
 });
 
 app.post("/api/update", async (req, res) => {
