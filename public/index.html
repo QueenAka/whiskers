@@ -9,15 +9,15 @@
   </head>
   <body>
     <nav>
-      <svg
+      <img
         width="30px"
         height="30px"
         class="user"
         onclick="goto('/pages/user')"
         src="/media/image/profile.png"
-      >
+      />
       <a id="home" href="/">
-        <img class="logo" src="/media/image/logo.png">
+        <img class="logo" src="/media/image/logo.png" />
         Whiskers
       </a>
       <img
@@ -26,7 +26,7 @@
         class="settings"
         onclick="goto('/pages/settings')"
         src="/media/image/settings.png"
-      >
+      />
     </nav>
     <div class="center">
       <center>
@@ -39,7 +39,12 @@
       <div class="lined">OR</div>
       <center>
         <h2>Create a new chat</h2>
-        <input placeholder="Chat name" type="text" id="chatName" autocomplete="off" />
+        <input
+          placeholder="Chat name"
+          type="text"
+          id="chatName"
+          autocomplete="off"
+        />
         <button onclick="create()">Create</button>
       </center>
     </div>
@@ -50,7 +55,7 @@
     function creater() {
       let author = localStorage.getItem("name");
       let name = document.getElementById("chatName").value;
-      if(!name) return
+      if (!name) return;
       fetch("/api/new", {
         method: "POST",
         headers: {
@@ -59,7 +64,7 @@
         body: JSON.stringify({
           username: author,
           chatName: name,
-        })
+        }),
       })
         .then((res) => res.json())
         .then((data) => {

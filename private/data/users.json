@@ -1,1 +1,24 @@
-{"akatech":{"displayName":"Aka","password":"ABGABHACAACJACJACFABOABP","settings":{"nameColor":"#f1f1f1","notifSounds":true,"notifSound":"meow.mp3"},"ownedChats":[],"bannedChats":[]},"sploogles":{"displayName":"≡;- ꒰ corpse ꒱","password":"ABPABUABSABHACCACCABNACCABTABHACCABCABAABT","settings":{"nameColor":"#6dc9c2","notifSounds":true,"notifSound":"meow.mp3"},"ownedChats":[],"bannedChats":[]}}
+{
+  "akatech": {
+    "displayName": "Aka",
+    "password": "Gh0407op!",
+    "settings": {
+      "nameColor": "#f1f1f1",
+      "notifSounds": true,
+      "notifSound": "meow.mp3"
+    },
+    "ownedChats": [],
+    "bannedChats": []
+  },
+  "sploogles": {
+    "displayName": "≡;- ꒰ corpse ꒱",
+    "password": "push33n3th3cat",
+    "settings": {
+      "nameColor": "#6dc9c2",
+      "notifSounds": true,
+      "notifSound": "meow.mp3"
+    },
+    "ownedChats": [],
+    "bannedChats": []
+  }
+}

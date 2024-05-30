@@ -3,7 +3,6 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const Picrypt = require(path.join(__dirname, "private/data/picrypt.js"));
 const pi = new Picrypt();
 let clients = [];
 let emojisList = [];
@@ -100,14 +99,14 @@ app.post("/events/post", (req, res) => {
 });
 
 app.get("/api/emojis", async (req, res) => {
-  await loadEmojis();
+  loadEmojis();
   res.json(emojisList);
 });
 
 app.post("/api/signup", async (req, res) => {
   try {
     let username = req.body.username;
-    let password = pi.encrypt(req.body.password);
+    let password = req.body.password;
     let data = JSON.parse(
       fs.readFileSync(path.join(__dirname, "private/data/users.json")),
     );
@@ -208,7 +207,7 @@ app.post("/api/settings", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     let username = req.body.username;
-    let password = pi.encrypt(req.body.password);
+    let password = req.body.password;
     let data = JSON.parse(
       fs.readFileSync(path.join(__dirname, "private/data/users.json")),
     );
@@ -216,7 +215,7 @@ app.post("/api/login", async (req, res) => {
 
     if (!user) return res.status(404).json({ error: "User not found." });
     if (user.password !== password)
-      return res.status(403).json({ error: "Incorrect password." });
+      return res.status(403).json({ error: "Incorrect username or password." });
 
     res.json({ success: true, user, name: username });
   } catch (error) {
