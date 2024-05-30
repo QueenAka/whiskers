@@ -3,7 +3,6 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const pi = new Picrypt();
 let clients = [];
 let emojisList = [];
 
@@ -86,7 +85,7 @@ app.post("/events/post", (req, res) => {
     });
     res.json({ id: clientId });
     console.log("New client created");
-  } else if (type === "messageCreate") {
+  } else if (type == "messageCreate") {
     let newJson = {
       type: "messageCreate",
       url: url,
