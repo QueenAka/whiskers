@@ -4,7 +4,8 @@
   --t: #f1f1f1;
   --lt: #aaaaaa;
   --b: #131517;
-  --sp: #13ecaf;
+  --sp: #D80448;
+  --warn: #E6D581;
 }
 
 ::-moz-selection {
@@ -188,8 +189,8 @@ nav a {
   border-radius: 5px;
 }
 
-#imageGetter {
-  display: none;
+#msginp:focus {
+  box-shadow: none;
 }
 
 .icon {
@@ -205,11 +206,6 @@ nav a {
   transform: scale(0.95);
 }
 
-.userImg {
-  max-width: 300px;
-  border-radius: 10px;
-}
-
 #log {
   height: calc(100vh - 102px);
   width: 100vw;
@@ -223,13 +219,9 @@ nav a {
   margin: 0;
   width: calc(100% - 5px);
   display: block;
-  overflow-wrap: break-word;
   cursor: normal;
-  word-break: break-all;
-  white-space: normal;
   position: relative;
   height: fit-content;
-  vertical-align: center;
   color: var(--t);
 }
 
@@ -296,10 +288,9 @@ spoiler[clicked=true]{
 }
 
 .emoji {
-  width: 25px;
-  height: 25px;
-  margin: 0;
-  vertical-align: center;
+  width: 20px;
+  height: 20px;
+  margin: 0 2px 3px 0;
 }
 
 .emoji:active {
@@ -384,7 +375,7 @@ spoiler[clicked=true]{
 
 .notif {
   position: fixed;
-  top: 25px;
+  top: 75px;
   left: 50%;
   transform: translateX(-50%);
   min-width: 75px;
@@ -398,7 +389,6 @@ spoiler[clicked=true]{
   justify-content: center;
   font-weight: bold;
   z-index: 999;
-  border: 2px solid var(--sp);
   animation: fadein 0.1s;
   padding: 2.5px 5px;
   border-radius: 5px;
@@ -448,8 +438,10 @@ spoiler[clicked=true]{
 @keyframes swipeup {
   from {
     bottom: -200px;
+    z-index: 0;
   } to {
     bottom: 50px;
+    z-index: 0;
   }
 }
 
@@ -467,8 +459,10 @@ spoiler[clicked=true]{
 @keyframes swipedown {
   from {
     bottom: 50px;
+    z-index: 0;
   } to {
     bottom: -200px;
+    z-index: 0;
   }
 }
 
@@ -478,4 +472,22 @@ a {
 
 reply {
   margin: 0;
+}
+
+warn {
+  width: fit-content;
+  max-width: 300px;
+  margin: 5px;
+  color: var(--warn);
+  box-shadow: 0 0 0 2px var(--warn);
+  padding: 5px;
+  border-radius: 5px;
+  text-size: 17px;
+  display: block;
+}
+
+.messageContent {
+  display: flex;
+  justify-content: left;
+  align-items: center;
 }

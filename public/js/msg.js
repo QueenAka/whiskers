@@ -34,9 +34,11 @@ fetch("/events/post", {
         let msgId = Math.floor(Math.random() * 100000000000000);
         resetTimer();
         messageData = JSON.parse(message.data);
-        lastUser = messageData.author;
-        if (lastUser == "[SERVER]")
-          messageData.content = clean(messageData.content);
+        const author = messageData.author;
+        if (author == "[SERVER]") {
+          messageData.author = clean(messageData.content);
+          messageData.content = "";
+        }
 
         const messages = document.getElementById("log");
 
@@ -59,9 +61,10 @@ fetch("/events/post", {
         topDiv.appendChild(dateSpan);
         topDiv.innerHTML += "<br>";
 
-        msgDiv.appendChild(topDiv);
+        if (author != lastUser) msgDiv.appendChild(topDiv);
 
         const bottomSpan = document.createElement("span");
+        bottomSpan.classList.add("messageContent");
         bottomSpan.innerHTML = messageData.content;
 
         const replyDiv = document.createElement("div");
@@ -82,14 +85,11 @@ fetch("/events/post", {
         bottomDiv.appendChild(bottomSpan);
         bottomDiv.appendChild(replyDiv);
         bottomDiv.appendChild(copyDiv);
-
-        if (lastUser === uname) {
-          msgDiv.classList.add("msgr");
-        }
-
         msgDiv.appendChild(bottomDiv);
-
         messages.appendChild(msgDiv);
+
+        resetTimer();
+        lastUser = author;
 
         aud = "/media/audio/" + settings.settings.notifSound;
         if (settings.settings.notifSounds == true) {
@@ -105,7 +105,7 @@ fetch("/events/post", {
 document.getElementById("msginp").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
-    document.getElementById("msgsend").click();
+    send();
   }
 });
 
@@ -147,10 +147,9 @@ function send() {
   const msg = document.getElementById("msginp").value;
   if (msg.trim().length < 1) return;
   if (msg.trim().length > 2000) return notif("Message too long!");
-  const type = "messageCreate";
   document.getElementById("msginp").value = "";
   let json = {
-    type: type,
+    type: "messageCreate",
     data: JSON.stringify({
       content: clean(msg),
       author: uname,

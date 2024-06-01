@@ -1,10 +1,10 @@
 <!doctype html>
 <html>
   <head>
-    <title id="title">Whiskers |</title>
+    <title id="title">Whiskers | Chat</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" href="/emojis/1.png" />
+    <link rel="icon" type="image/png" href="/media/image/icons/logo.png" />
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
@@ -32,22 +32,10 @@
     <div class="bottom-nav" id="bottom-nav">
       <input placeholder="Send a message..." id="msginp" type="text" />
       <img onclick="emoji()" class="icon" src="/media/image/icons/emoji.png" />
-      <img
-        onclick="send()"
-        id="msgsend"
-        src="/media/image/icons/send.png"
-        class="icon"
-      />
+      <img onclick="// ..." class="icon" src="/media/image/icons/command.png" />
+      <img onclick="send()" src="/media/image/icons/send.png" class="icon" />
     </div>
-    <input type="file" id="imageGetter" accept="*" />
     <script src="/js/msg.js"></script>
     <script src="/js/all.js"></script>
-    <script>
-      async function load() {
-        const titleElm = document.getElementByID("title");
-        const title = await new DependableVariables("chat.name");
-        titleElm.innerHTML = `Whiskers | ${title}`;
-      }
-    </script>
   </body>
 </html>

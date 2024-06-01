@@ -64,36 +64,36 @@
       <div class="tab" id="jc" onclick="select(this.id)">Joined</div>
     </div>
     <div id="spc">
-      <center class="center lt">
+      <center class="center">
         <h3 class="lt">None yet...</h3>
       </center>
     </div>
-    <div id="sjac" style="display: none;">
+    <div id="sjac" style="display: none">
       <center class="center">
         <h3>Join a Chat</h3>
-        <input placeholder="Chat ID..." type="text" /> <button>Join</button>
+        <input placeholder="Chat ID..." type="text" id="joinId" />
+        <button
+          onclick="goto(`/chats/${document.getElementById('joinId').value}`)"
+        >
+          Join
+        </button>
       </center>
     </div>
-    <div id="scac" style="display: none;">
+    <div id="scac" style="display: none">
       <center class="center">
         <h2>Create a Chat</h2>
         <h3>Chat Name</h3>
-        <input placeholder="Chat name..." type="text" /> 
-        <h3>Visibility</h3>
-        <input type="radio">
-        <input type="radio">
-        <input type="radio">
-        
-        <button>Create</button>
+        <input placeholder="Chat name..." type="text" /> <button>Create</button>
+        <warn>THIS DOES NOT CURRENTLY DO ANYTHING</warn>
       </center>
     </div>
-    <div id="sjc" style="display: none;">
+    <div id="sjc" style="display: none">
       <center class="center">
         <h3 class="lt">None yet...</h3>
       </center>
     </div>
     <script>
-      function select(id){
+      function select(id) {
         document.getElementById("pc").classList.remove("active");
         document.getElementById("jac").classList.remove("active");
         document.getElementById("cac").classList.remove("active");
@@ -103,7 +103,7 @@
         document.getElementById("scac").style.display = "none";
         document.getElementById("sjc").style.display = "none";
         document.getElementById(id).classList.add("active");
-        document.getElementById("s"+id).style.display = "block";
+        document.getElementById("s" + id).style.display = "block";
       }
     </script>
   </body>

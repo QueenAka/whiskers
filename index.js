@@ -28,9 +28,11 @@ app.use(
   express.static(path.join(__dirname, "public"), { extensions: ["html"] }),
 );
 
-function sendToClients(msg) {
-  clients.forEach((client) => {
-    console.log("Sending to client " + client.id);
+function sendToClients(msg, url) {
+  const clientsToSend = clients.filter((client) => {
+    return client.url === url;
+  });
+  clientsToSend.forEach((client) => {
     client.res.write("data: " + msg);
   });
 }
@@ -59,19 +61,23 @@ app.get("/events/get", (req, res) => {
           author: "[SERVER]",
         }),
       })}\n\n`,
+      client.url,
     );
   }
 
   req.on("close", () => {
+    const clientUrl = client.url;
+    const clientAuthor = client.author;
     clients = clients.filter((c) => c.id !== id);
+    res.end();
     sendToClients(
       `${JSON.stringify({
         type: "messageCreate",
-        url: client.url,
-        msg: `**${client.author}** has left the chat.`,
+        url: clientUrl,
+        msg: `**${clientAuthor}** has left the chat.`,
       })}\n\n`,
+      clientUrl,
     );
-    res.end();
   });
 });
 
@@ -86,14 +92,13 @@ app.post("/events/post", (req, res) => {
       res: null,
     });
     res.json({ id: clientId });
-    console.log("New client created");
   } else if (type == "messageCreate") {
     let newJson = {
       type: "messageCreate",
       url: url,
       data: data,
     };
-    sendToClients(JSON.stringify(newJson) + "\n\n");
+    sendToClients(JSON.stringify(newJson) + "\n\n", url);
   } else {
     res.status(400).json({ error: "Invalid type" });
   }
