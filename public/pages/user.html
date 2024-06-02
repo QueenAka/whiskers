@@ -36,35 +36,13 @@
         <input placeholder="Password" id="password" type="password" /><br />
         <button id="login" onclick="login()">Login</button>
         <button id="signup" onclick="signup()">Sign up</button>
-        <center><div id="err"></div></center>
       </div>
     </div>
+    <script src="/js/all.js"></script>
     <script>
-      function err(msg) {
-        let div = document.getElementById("err");
-        div.innerHTML = msg;
-      }
-
-      function checkName(name) {
-        if (name.length < 3) {
-          err("Username must be at least 3 characters long");
-          return false;
-        }
-        if (name.length > 20) {
-          err("Username must be less than 20 characters long");
-          return false;
-        }
-        if (name.match(/[^a-z0-9_]/g)) {
-          err(
-            "Username can only contain lowercase letters, numbers, and underscores",
-          );
-          return false;
-        }
-        return true;
-      }
-
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("r");
       function login() {
-        err("");
         let username = document.getElementById("username").value;
         let password = document.getElementById("password").value;
         fetch("/api/login", {
@@ -79,17 +57,15 @@
         })
           .then((res) => res.json())
           .then((data) => {
-            if (data.error) return err(`${data.error}`);
-            localStorage.setItem("userData", JSON.stringify(data.user));
-            localStorage.setItem("name", data.name);
-            goto("settings");
+            if (data.error) return popup(`${data.error}`);
+            localStorage.setItem("account", data.name);
+            if (redirect) return goto(redirect);
+            goto("/pages/settings");
           });
       }
 
       function signup() {
-        err("");
         let username = document.getElementById("username").value;
-        if (!checkName(username)) return;
         let password = document.getElementById("password").value;
         fetch("/api/signup", {
           method: "POST",
@@ -103,14 +79,12 @@
         })
           .then((res) => res.json())
           .then((data) => {
-            if (data.error) return err(`${data.error}`);
-            localStorage.setItem("userData", JSON.stringify(data.user));
-            localStorage.setItem("name", data.name);
-            goto("settings");
+            if (data.error) return popup(`${data.error}`);
+            localStorage.setItem("account", data.name);
+            if (redirect) return goto(redirect);
+            goto("/pages/settings");
           });
       }
     </script>
   </body>
-  <script src="/js/script.js"></script>
-  <script src="/js/all.js"></script>
 </html>

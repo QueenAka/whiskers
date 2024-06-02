@@ -29,117 +29,36 @@
       />
     </nav>
     <div class="sttn">
-      <div class="lined">Customization</div>
-      <h3>Display name <input type="text" id="displayName" /></h3>
-      <h3>Name color</h3>
-      <input type="color" id="nameColor" />
-      <div class="lined">Notifications</div>
-      <h3>
-        Play notifacation sounds <input type="checkbox" id="notifSounds" />
-      </h3>
-      <h3>Notifacation sound</h3>
-      <select id="notifSound">
-        <option value="meow.mp3">Meow</option>
-        <option value="bark.mp3">Bark</option>
-        <option value="bonk.mp3">Bonk</option>
-        <option value="ding.mp3">Ding</option>
-      </select>
-      <br /><br />
-      <button onclick="save()">Save</button>
-      <button onclick="reset()">Reset</button>
-      <button onclick="logout()">Log out</button>
+      <warn>SETTINGS ARE BEING REWORKED AND DO NOT WORK AS OF NOW</warn>
+      <div class="lined">Account</div>
+      <h3>Display Name:</h3>
+      <input>
+      <h3>Change Username:</h3>
+      <p>New Username</p>
+      <input>
+      <p>Password</p>
+      <input type="password">
+      <h3>Change Password:</h3>
+      <p>Old Password</p>
+      <input type="password">
+      <p>New Password</p>
+      <input type="password">
+      <p>Confirm New Password</p>
+      <input type="password">
+      <h3>Delete Account:</h3>
+      <p>Password</p>
+      <input type="password">
+      <button>Delete</button>
+      <div class="lined">Chats</div>
+      <h3>Display user join Messages:</h3>
+      <input type="checkbox">
+      <h3>Display custom user Name Colors:</h3>
+      <input type="checkbox">
+      <h3>Display custom user Display Names</h3>
+      <input type="checkbox">
+      <h3>Play notification Sounds:</h3>
+      <input type="checkbox">
     </div>
-    <script>
-      function logout() {
-        localStorage.removeItem("userData");
-        localStorage.removeItem("name");
-        notif("Logging out...");
-        setTimeout(() => {
-          goto("/pages/user");
-        }, 500);
-      }
-
-      let settings = JSON.parse(localStorage.getItem("userData"));
-      if (!settings) {
-        goto("/pages/user");
-      }
-      document.getElementById("displayName").value = settings.displayName;
-      document.getElementById("nameColor").value = settings.settings.nameColor;
-      document.getElementById("notifSounds").checked =
-        settings.settings.notifSounds;
-      document.getElementById("notifSound").value =
-        settings.settings.notifSound;
-
-      function save() {
-        let displayName = document.getElementById("displayName").value;
-        let sttns = {
-          nameColor: document.getElementById("nameColor").value,
-          notifSounds: document.getElementById("notifSounds").checked,
-          notifSound: document.getElementById("notifSound").value,
-        };
-        settings.settings = sttns;
-        settings.displayName = displayName;
-        fetch("/api/update", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            json: settings,
-            username: localStorage.getItem("name"),
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.res == "Success") {
-              localStorage.setItem("userData", JSON.stringify(settings));
-              reload("Settings saved");
-            } else {
-              reload("Failed to save settings");
-            }
-          });
-      }
-
-      function reload(txt) {
-        let uuserData = JSON.parse(localStorage.getItem("userData"));
-        document.getElementById("displayName").value = uuserData.displayName;
-        document.getElementById("nameColor").value =
-          uuserData.settings.nameColor;
-        document.getElementById("notifSounds").checked =
-          uuserData.settings.notifSounds;
-        document.getElementById("notifSound").value =
-          uuserData.settings.notifSound;
-        notif(txt);
-      }
-
-      function reset() {
-        let sttns = {
-          nameColor: "#f1f1f1",
-          notifSounds: true,
-          notifSound: "meow.mp3",
-        };
-        settings.settings = sttns;
-        localStorage.setItem("userData", JSON.stringify(settings));
-        fetch("/api/update", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            json: settings,
-            username: localStorage.getItem("name"),
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.res == "Success") {
-              reload("Settings reset");
-            } else {
-              reload("Failed to reset settings");
-            }
-          });
-      }
-    </script>
   </body>
   <script src="/js/script.js"></script>
   <script src="/js/all.js"></script>

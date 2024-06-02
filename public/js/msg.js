@@ -1,122 +1,166 @@
-let lastUser = null;
-let client = null;
-
-function goto(url) {
-  window.location.href = url;
-}
-
-const settings = JSON.parse(localStorage.getItem("userData"));
-if (settings == null) {
-  goto("/pages/user");
-}
-let uname = settings.displayName;
-
-fetch("/events/post", {
+let userData;
+let uname;
+let lastUser;
+fetch("/api/settings", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    type: "chatJoin",
-    url: window.location.href,
-    data: uname,
+    username: accountName,
   }),
 })
   .then((res) => res.json())
   .then((data) => {
-    client = new EventSource(`/events/get?id=${data.id}`);
-    client.addEventListener("message", function (event) {
-      let message = JSON.parse(event.data);
-      if (
-        message.type == "messageCreate" &&
-        message.url == window.location.href
-      ) {
-        let msgId = Math.floor(Math.random() * 100000000000000);
-        resetTimer();
-        messageData = JSON.parse(message.data);
-        const author = messageData.author;
-        if (author == "[SERVER]") {
-          messageData.author = clean(messageData.content);
-          messageData.content = "";
-        }
+    if (data.error) {
+      localStorage.removeItem("account");
+      goto("/pages/user?r=" + window.location.href);
+      return;
+    }
+    if (data.res == "Success") {
+      userData = data.json;
+      if (userData != null) {
+        lastUser = null;
+        let client = null;
+        uname = userData.settings.displayName;
 
-        const messages = document.getElementById("log");
+        fetch("/events/post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "chatJoin",
+            url: window.location.href,
+            data: uname,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            client = new EventSource(`/events/get?id=${data.id}`);
+            client.addEventListener("message", function (event) {
+              let message = JSON.parse(event.data);
+              if (
+                message.type == "messageCreate" &&
+                message.url == window.location.href
+              ) {
+                let msgId = message.id;
+                resetTimer();
+                messageData = JSON.parse(message.data);
+                const author = messageData.author;
+                lastUser = author;
+                if (author == "[SERVER]") {
+                  messageData.author = clean(messageData.content);
+                  messageData.content = "";
+                  lastUser = msgId;
+                }
 
-        const msgDiv = document.createElement("div");
-        msgDiv.classList.add("msgr");
-        msgDiv.id = `msg-${msgId}`;
+                const messages = document.getElementById("log");
 
-        const topDiv = document.createElement("div");
-        topDiv.classList.add("top");
+                const msgDiv = document.createElement("div");
+                msgDiv.classList.add("msgr");
+                msgDiv.id = `msg-${msgId}`;
 
-        const authorSpan = document.createElement("b");
-        authorSpan.id = msgId;
-        authorSpan.innerHTML = messageData.author;
+                const topDiv = document.createElement("div");
+                topDiv.classList.add("top");
 
-        const dateSpan = document.createElement("span");
-        dateSpan.classList.add("lt");
-        dateSpan.innerHTML = ` ${formateDate(new Date())}`;
+                const authorSpan = document.createElement("b");
+                authorSpan.id = msgId;
+                authorSpan.innerHTML = messageData.author;
 
-        topDiv.appendChild(authorSpan);
-        topDiv.appendChild(dateSpan);
-        topDiv.innerHTML += "<br>";
+                const dateSpan = document.createElement("span");
+                dateSpan.classList.add("lt");
+                dateSpan.innerHTML = ` ${formateDate(new Date())}`;
 
-        if (author != lastUser) msgDiv.appendChild(topDiv);
+                topDiv.appendChild(authorSpan);
+                topDiv.appendChild(dateSpan);
+                topDiv.innerHTML += "<br>";
 
-        const bottomSpan = document.createElement("span");
-        bottomSpan.classList.add("messageContent");
-        bottomSpan.innerHTML = messageData.content;
+                if (author != lastUser) msgDiv.appendChild(topDiv);
 
-        const replyDiv = document.createElement("div");
-        replyDiv.classList.add("reply");
-        replyDiv.innerHTML = "Reply";
-        replyDiv.onclick = function () {
-          reply(msgId);
-        };
+                const bottomSpan = document.createElement("span");
+                bottomSpan.classList.add("messageContent");
+                bottomSpan.innerHTML = clean(messageData.content);
 
-        const copyDiv = document.createElement("div");
-        copyDiv.classList.add("copy");
-        copyDiv.innerHTML = "Copy";
-        copyDiv.onclick = function () {
-          copy(removeReply(JSON.parse(message.data).content));
-        };
+                const replyDiv = document.createElement("div");
+                replyDiv.classList.add("reply");
+                replyDiv.innerHTML = "Reply";
+                replyDiv.onclick = function () {
+                  reply(msgId);
+                };
 
-        const bottomDiv = document.createElement("div");
-        bottomDiv.appendChild(bottomSpan);
-        bottomDiv.appendChild(replyDiv);
-        bottomDiv.appendChild(copyDiv);
-        msgDiv.appendChild(bottomDiv);
-        messages.appendChild(msgDiv);
+                const copyDiv = document.createElement("div");
+                copyDiv.classList.add("copy");
+                copyDiv.innerHTML = "Copy";
+                copyDiv.onclick = function () {
+                  copy(removeReply(messageData.content));
+                };
 
-        resetTimer();
-        lastUser = author;
+                const bottomDiv = document.createElement("div");
+                bottomDiv.appendChild(bottomSpan);
+                bottomDiv.appendChild(replyDiv);
+                bottomDiv.appendChild(copyDiv);
+                msgDiv.appendChild(bottomDiv);
+                messages.appendChild(msgDiv);
 
-        aud = "/media/audio/" + settings.settings.notifSound;
-        if (settings.settings.notifSounds == true) {
-          var audio = new Audio(aud);
-          audio.loop = false;
-          audio.play();
-        }
-        messages.scrollTop = messages.scrollHeight;
+                resetTimer();
+
+                aud = "/media/audio/meow.mp3";
+                if (userData.settings.notifSounds != false) {
+                  var audio = new Audio(aud);
+                  audio.loop = false;
+                  audio.play();
+                }
+                messages.scrollTop = messages.scrollHeight;
+              }
+            });
+          });
+
+        document.getElementById("msginp").addEventListener("keydown", (e) => {
+          function addSymbol(s) {
+            l = s.split("").length;
+            e.preventDefault();
+            let selStart = e.target.selectionStart;
+            let selEnd = e.target.selectionEnd;
+            let text = e.target.value;
+            e.target.value =
+              text.substring(0, selStart) +
+              s +
+              text.substring(selStart, selEnd) +
+              s +
+              text.substring(selEnd);
+            e.target.selectionEnd = selEnd + l;
+            e.target.selectionStart = selStart + l;
+          }
+          if (e.key === "Enter") {
+            e.preventDefault();
+            send();
+          } else if (e.key === "b" && e.ctrlKey) {
+            addSymbol("**");
+          } else if (e.key === "i" && e.ctrlKey) {
+            addSymbol("*");
+          } else if (e.key === "u" && e.ctrlKey) {
+            addSymbol("_");
+          } else if (e.key === "s" && e.ctrlKey) {
+            addSymbol("~~");
+          } else if (e.key === "e" && e.ctrlKey) {
+            addSymbol(":");
+          }
+        });
+
+        allEmojis = [];
+
+        fetch("/api/emojis")
+          .then((res) => res.json())
+          .then((emojis) => {
+            emojis.forEach((emoji) => {
+              allEmojis.push(emoji);
+            });
+          });
       }
-    });
-  });
-
-document.getElementById("msginp").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    send();
-  }
-});
-
-allEmojis = [];
-
-fetch("/api/emojis")
-  .then((res) => res.json())
-  .then((emojis) => {
-    emojis.forEach((emoji) => {
-      allEmojis.push(emoji);
-    });
+    } else {
+      goto("/pages/user?r=" + window.location.href);
+    }
   });
 
 let msgTimeout = setTimeout(() => {
@@ -124,9 +168,52 @@ let msgTimeout = setTimeout(() => {
   console.log("Resetted");
 }, 60000);
 
+function highlight(id) {
+  let doc = document.getElementById(`msg-${id}`);
+  doc.style.background = "var(--sp)";
+  setTimeout(() => {
+    doc.style.background = "";
+  }, 1000);
+}
+
+let emojiOpened = false;
+function emoji() {
+  if (emojiOpened == false) {
+    emojiOpened = true;
+    let chooser = document.createElement("div");
+    chooser.classList = "emoji-chooser";
+    let list = "";
+    allEmojis.forEach((emoji) => {
+      list += `<img src='${emoji.url}'  class='list-item' onclick='emojiClick("${emoji.name}")'>`;
+    });
+    chooser.innerHTML = list;
+    chooser.id = "emojiChooser";
+    let nav = document.getElementById("bottom-nav");
+    document.body.appendChild(chooser);
+    setTimeout(() => {
+      nav.classList.add("nav-emoji-picker");
+    }, 50);
+  } else {
+    emojiOpened = false;
+    let chooser = document.getElementById("emojiChooser");
+    let nav = document.getElementById("bottom-nav");
+    chooser.style.animation = "swipedown 0.4s ease-out";
+    setTimeout(() => {
+      nav.classList.remove("nav-emoji-picker");
+      setTimeout(() => {
+        chooser.remove();
+      }, 75);
+    }, 125);
+  }
+}
+
+function emojiClick(name) {
+  document.getElementById("msginp").value += ":" + name + ":";
+}
+
 function removeReply(msg) {
-  const replyRegexTwo = /\<a href=\"\#.*?\"><reply>.*?\<\/reply><\/a><br>/g;
-  msg = msg.replace(replyRegexTwo, "").trim();
+  const replyRegex = /\{\d+\}/g;
+  msg = msg.replace(replyRegex, "").trim();
   return msg;
 }
 
@@ -151,10 +238,10 @@ function send() {
   let json = {
     type: "messageCreate",
     data: JSON.stringify({
-      content: clean(msg),
+      content: msg,
       author: uname,
     }),
-    url: window.location.href,
+    url: window.location.href.split("#")[0],
   };
   fetch("/events/post", {
     method: "POST",
@@ -181,7 +268,6 @@ function clean(msg) {
   const boldRegex = /\*\*(.*?)\*\*/g;
   const strikethroughRegex = /~~(.*?)~~/g;
   const underlineRegex = /_(.*?)_/g;
-  const spoilerRegex = /\|\|(.*?)\|\|/g;
   const id = Math.floor(Math.random() * 100000000);
   msg = msg.replace(/</g, "&lt;");
   msg = msg.replace(headerRegex, function (match, p1, p2) {
@@ -201,10 +287,6 @@ function clean(msg) {
   msg = msg.replace(italicsRegex, "<i>$1</i>");
   msg = msg.replace(strikethroughRegex, "<del>$1</del>");
   msg = msg.replace(underlineRegex, "<u>$1</u>");
-  msg = msg.replace(
-    spoilerRegex,
-    `<spoiler onclick="show('${id}')" id="${id}" clicked="false">$1</spoiler>`,
-  );
   msg = msg.replace(replyRegex, function (match) {
     let msgId = match.replace("{", "").replace("}", "");
     let doc = document.getElementById(msgId);
@@ -212,26 +294,14 @@ function clean(msg) {
       return match;
     } else {
       let txt = doc.innerHTML;
-      if (lastUser == uname) lastUser = null;
-      return `<a href="#${msgId}" onclick="highlight('${msgId}')"><reply>Replying to ${removeReply(
+      lastUser = null;
+      return `<a href="#${msgId}" onclick="highlight('${msgId}')" class="replyBlock"><reply>Replying to ${removeReply(
         txt,
-      )}</reply></a><br>`;
+      )}</reply></a>`;
     }
   });
   msg = msg.replace("\\", "<span class='none'>\\</span>");
   return msg;
-}
-
-function highlight(id) {
-  let doc = document.getElementById(`msg-${id}`);
-  doc.style.background = "var(--sp)";
-  setTimeout(() => {
-    doc.style.background = "";
-  }, 1000);
-}
-
-function show(id) {
-  document.getElementById(id).setAttribute("clicked", "true");
 }
 
 function formateDate(date) {
@@ -268,39 +338,4 @@ function notif(txt) {
       notif.remove();
     }, 125);
   }, 1500);
-}
-
-let emojiOpened = false;
-function emoji() {
-  if (emojiOpened == false) {
-    emojiOpened = true;
-    let chooser = document.createElement("div");
-    chooser.classList = "emoji-chooser";
-    let list = "";
-    allEmojis.forEach((emoji) => {
-      list += `<img src='${emoji.url}'  class='list-item' onclick='emojiClick("${emoji.name}")'>`;
-    });
-    chooser.innerHTML = list;
-    chooser.id = "emojiChooser";
-    let nav = document.getElementById("bottom-nav");
-    document.body.appendChild(chooser);
-    setTimeout(() => {
-      nav.classList.add("nav-emoji-picker");
-    }, 50);
-  } else {
-    emojiOpened = false;
-    let chooser = document.getElementById("emojiChooser");
-    let nav = document.getElementById("bottom-nav");
-    chooser.style.animation = "swipedown 0.4s ease-out";
-    setTimeout(() => {
-      nav.classList.remove("nav-emoji-picker");
-      setTimeout(() => {
-        chooser.remove();
-      }, 75);
-    }, 125);
-  }
-}
-
-function emojiClick(name) {
-  document.getElementById("msginp").value += ":" + name + ":";
 }

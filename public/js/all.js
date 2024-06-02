@@ -1,12 +1,11 @@
-const userN = localStorage.getItem("name");
-
+const accountName = localStorage.getItem("account");
 fetch("/api/settings", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    username: userN,
+    username: accountName,
   }),
 })
   .then((res) => res.json())
@@ -17,13 +16,12 @@ fetch("/api/settings", {
       return;
     }
     if (data.res == "Success") {
-      localStorage.setItem("userData", JSON.stringify(data.json));
-      const userD = JSON.parse(localStorage.getItem("userData"));
-      if (userD != null) {
+      userData = data.json;
+      if (userData != null) {
         if (window.location.href.includes("/pages/user"))
           goto("/pages/settings");
       } else if (window.location.href.includes("chats")) {
-        goto("/pages/user");
+        goto("/pages/user?r=" + window.location.href);
       }
     }
   });
@@ -85,4 +83,17 @@ class DependableVariables {
       }
     }
   }
+}
+
+function popup(txt) {
+  const notif = document.createElement("div");
+  notif.classList = "notif";
+  notif.innerHTML = txt;
+  document.body.appendChild(notif);
+  setTimeout(() => {
+    notif.style.opacity = 0;
+    setTimeout(() => {
+      notif.remove();
+    }, 125);
+  }, 1500);
 }

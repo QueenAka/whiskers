@@ -193,6 +193,10 @@ nav a {
   box-shadow: none;
 }
 
+.messageContent * {
+  margin: 0;
+}
+
 .icon {
   width: 20px;
   height: 20px;
@@ -290,7 +294,7 @@ spoiler[clicked=true]{
 .emoji {
   width: 20px;
   height: 20px;
-  margin: 0 2px 3px 0;
+  margin: 0 2px 3px 2px;
 }
 
 .emoji:active {
@@ -490,4 +494,19 @@ warn {
   display: flex;
   justify-content: left;
   align-items: center;
+  flex-wrap: wrap;
+}
+
+reply * {
+  color: var(--sp);
+}
+
+reply {
+  display: block;
+  width: 100%;
+}
+
+.replyBlock {
+  width: 100%;
+  display: block;
 }
