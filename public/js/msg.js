@@ -175,6 +175,7 @@ let msgTimeout = setTimeout(() => {
 }, 60000);
 
 function highlight(id) {
+  document.getElementById("msginp").focus();
   let doc = document.getElementById(`msg-${id}`);
   doc.style.background = "var(--sp)";
   setTimeout(() => {
@@ -184,6 +185,7 @@ function highlight(id) {
 
 let emojiOpened = false;
 function emoji() {
+  document.getElementById("msginp").focus();
   if (emojiOpened == false) {
     emojiOpened = true;
     let chooser = document.createElement("div");
@@ -214,6 +216,7 @@ function emoji() {
 }
 
 function emojiClick(name) {
+  document.getElementById("msginp").focus();
   document.getElementById("msginp").value += ":" + name + ":";
 }
 
@@ -237,6 +240,7 @@ function notif(txt) {
 }
 
 function send() {
+  document.getElementById("msginp").focus();
   const msg = document.getElementById("msginp").value;
   if (msg.trim().length < 1) return;
   if (msg.trim().length > 2000) return notif("Message too long!");
@@ -327,11 +331,12 @@ function formateDate(date) {
 }
 
 function reply(msg) {
-  document.getElementById("msginp").value = "{" + msg + "} ";
   document.getElementById("msginp").focus();
+  document.getElementById("msginp").value = "{" + msg + "} ";
 }
 
 function copy(txt) {
+  document.getElementById("msginp").focus();
   navigator.clipboard.writeText(txt);
   notif("Copied text!");
 }
