@@ -1,5 +1,6 @@
 let userData;
 let uname;
+let dname;
 let lastUser;
 fetch("/api/settings", {
   method: "POST",
@@ -22,7 +23,8 @@ fetch("/api/settings", {
       if (userData != null) {
         lastUser = null;
         let client = null;
-        uname = userData.settings.displayName;
+        uname = accountName;
+        dname = userData.settings.displayName;
 
         fetch("/events/post", {
           method: "POST",
@@ -32,7 +34,10 @@ fetch("/api/settings", {
           body: JSON.stringify({
             type: "chatJoin",
             url: window.location.href,
-            data: uname,
+            data: {
+              username: uname,
+              displayName: dname,
+            },
           }),
         })
           .then((res) => res.json())
@@ -47,16 +52,17 @@ fetch("/api/settings", {
                 let msgId = message.id;
                 resetTimer();
                 messageData = JSON.parse(message.data);
-                const author = messageData.author;
-                lastUser = author;
-                if (author == "[SERVER]") {
-                  messageData.author = clean(messageData.content);
+                console.log(messageData);
+                let username = messageData.author.username;
+                if (username == "[SERVER]") username = message.id;
+                let displayName = messageData.author.displayName;
+                let appendUser = username != lastUser;
+                lastUser = username;
+                if (displayName == null) {
+                  displayName = clean(messageData.content);
                   messageData.content = "";
-                  lastUser = msgId;
                 }
-
                 const messages = document.getElementById("log");
-
                 const msgDiv = document.createElement("div");
                 msgDiv.classList.add("msgr");
                 msgDiv.id = `msg-${msgId}`;
@@ -66,7 +72,7 @@ fetch("/api/settings", {
 
                 const authorSpan = document.createElement("b");
                 authorSpan.id = msgId;
-                authorSpan.innerHTML = messageData.author;
+                authorSpan.innerHTML = displayName;
 
                 const dateSpan = document.createElement("span");
                 dateSpan.classList.add("lt");
@@ -76,7 +82,7 @@ fetch("/api/settings", {
                 topDiv.appendChild(dateSpan);
                 topDiv.innerHTML += "<br>";
 
-                if (author != lastUser) msgDiv.appendChild(topDiv);
+                if (appendUser) msgDiv.appendChild(topDiv);
 
                 const bottomSpan = document.createElement("span");
                 bottomSpan.classList.add("messageContent");
@@ -239,7 +245,10 @@ function send() {
     type: "messageCreate",
     data: JSON.stringify({
       content: msg,
-      author: uname,
+      author: {
+        username: uname,
+        displayName: dname,
+      },
     }),
     url: window.location.href.split("#")[0],
   };

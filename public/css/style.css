@@ -510,3 +510,37 @@ reply {
   width: 100%;
   display: block;
 }
+
+.cards {
+  max-width: 600px;
+  min-width: 300px;
+  height: calc(100% - 90px);
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 5px;
+}
+
+.chat-card {
+  width: calc(100% - 20px);
+  border-radius: 10px;
+  padding: 10px;
+  background-color: var(--b);
+}
+
+.chat-card .head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-card .head .name {
+  margin: 0;
+}
+
+.chat-card .head .author {
+  margin: 0 5px;
+  color: var(--lt);
+}

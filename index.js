@@ -56,8 +56,11 @@ app.get("/events/get", (req, res) => {
         type: "messageCreate",
         url: client.url,
         data: JSON.stringify({
-          content: `**${client.author}** has joined the chat!`,
-          author: "[SERVER]",
+          content: `**${client.author.displayName}** has joined the chat!`,
+          author: {
+            username: "[SERVER]",
+            displayName: null,
+          },
         }),
         id: Date.now().toString(),
       })}\n\n`,
@@ -67,7 +70,7 @@ app.get("/events/get", (req, res) => {
 
   req.on("close", () => {
     const clientUrl = client.url;
-    const clientAuthor = client.author;
+    const clientAuthor = client.author.displayName;
     clients = clients.filter((c) => c.id !== id);
     res.end();
     sendToClients(
@@ -77,6 +80,7 @@ app.get("/events/get", (req, res) => {
         data: JSON.stringify({
           content: `**${clientAuthor}** has left the chat.`,
           author: "[SERVER]",
+          display: null,
         }),
         id: Date.now().toString(),
       })}\n\n`,
@@ -231,10 +235,24 @@ app.post("/api/new", async (req, res) => {
   });
 });
 
+app.get("/api/chats", async (req, res) => {
+  const chats = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "private/data/chats.json"), "utf-8"),
+  );
+  let publicChats = [];
+  Object.values(chats).forEach((chat) => {
+    if (chat.visibility.type === "public") {
+      publicChats.push(chat);
+    }
+  });
+
+  res.json(publicChats);
+});
+
 app.get("/api/chats/:chatId", async (req, res) => {
   let chatId = req.params.chatId;
   let data = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/chats.json")),
+    fs.readFileSync(path.join(__dirname, "private/data/chats.json"), "utf-8"),
   );
   if (!data[chatId]) return res.status(404).json({ error: "Chat not found" });
   res.json(data[chatId]);

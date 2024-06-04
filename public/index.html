@@ -5,6 +5,9 @@
     <link rel="icon" type="image/png" href="/media/image/icons/logo.png" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="og:title" content="Whiskers" />
+    <meta name="og:description" content="Whiskers - Super Secret Messaging" />
+    <meta name="og:image" content="/media/image/icons/logo.png" />
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
@@ -63,11 +66,7 @@
       <div class="tab" id="cac" onclick="select(this.id)">Create</div>
       <div class="tab" id="jc" onclick="select(this.id)">Joined</div>
     </div>
-    <div id="spc">
-      <center class="center">
-        <h3 class="lt">None yet...</h3>
-      </center>
-    </div>
+    <div id="spc" class="cards"></div>
     <div id="sjac" style="display: none">
       <center class="center">
         <h3>Join a Chat</h3>
@@ -106,6 +105,40 @@
         document.getElementById(id).classList.add("active");
         document.getElementById("s" + id).style.display = "block";
       }
+
+      fetch("/api/chats")
+        .then((res) => res.json())
+        .then((data) => {
+          data.forEach((chat) => {
+            const chatDiv = document.createElement("div");
+            chatDiv.classList.add("chat-card");
+
+            const chatHead = document.createElement("div");
+            chatHead.classList.add("head");
+
+            const chatTitle = document.createElement("h3");
+            chatTitle.innerText = chat.name;
+            chatTitle.classList = "name";
+
+            const chatAuthor = document.createElement("p");
+            chatAuthor.innerText = `@${chat.author}`;
+            chatAuthor.classList = "author";
+
+            chatHead.appendChild(chatTitle);
+            chatHead.appendChild(chatAuthor);
+
+            const chatDescription = document.createElement("p");
+            chatDescription.innerText = chat.description;
+            chatDescription.classList = "desc";
+
+            chatDiv.appendChild(chatHead);
+            chatDiv.appendChild(chatDescription);
+            chatDiv.onclick = () => {
+              goto(`/chats/${chat.id}`);
+            };
+            document.getElementById("spc").appendChild(chatDiv);
+          });
+        });
     </script>
   </body>
 </html>
