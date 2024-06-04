@@ -278,6 +278,16 @@ app.get("/api/emojis", async (req, res) => {
   res.json(emojisList);
 });
 
+app.get("/api/commands", async (req, res) => {
+  const commands = JSON.parse(
+    fs.readFileSync(
+      path.join(__dirname, "private/data/commands.json"),
+      "utf-8",
+    ),
+  );
+  res.json(commands);
+});
+
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, "private/html/404.html"));
 });

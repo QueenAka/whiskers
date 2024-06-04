@@ -544,3 +544,27 @@ reply {
   margin: 0 5px;
   color: var(--lt);
 }
+
+.emoji-chooser h3 {
+  font-size: 18px;
+  color: var(--lt);
+  margin: 5px;
+  border-bottom: 2px solid var(--lt);
+}
+
+.emoji-chooser .list-item-card {
+  width: calc(100% - 20px);
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: var(--p);
+}
+
+.emoji-chooser .list-item-card b {
+  font-size: 16px;
+}
+
+.emoji-chooser .list-item-card p {
+  font-size: 14px;
+  color: var(--lt);
+}

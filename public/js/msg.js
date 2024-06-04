@@ -183,41 +183,101 @@ function highlight(id) {
   }, 1000);
 }
 
+let commandsOpened = false;
 let emojiOpened = false;
-function emoji() {
-  document.getElementById("msginp").focus();
-  if (emojiOpened == false) {
-    emojiOpened = true;
-    let chooser = document.createElement("div");
-    chooser.classList = "emoji-chooser";
-    let list = "";
-    allEmojis.forEach((emoji) => {
-      list += `<img src='${emoji.url}'  class='list-item' onclick='emojiClick("${emoji.name}")'>`;
-    });
-    chooser.innerHTML = list;
-    chooser.id = "emojiChooser";
-    let nav = document.getElementById("bottom-nav");
-    document.body.appendChild(chooser);
-    setTimeout(() => {
-      nav.classList.add("nav-emoji-picker");
-    }, 50);
-  } else {
-    emojiOpened = false;
-    let chooser = document.getElementById("emojiChooser");
-    let nav = document.getElementById("bottom-nav");
-    chooser.style.animation = "swipedown 0.4s ease-out";
-    setTimeout(() => {
-      nav.classList.remove("nav-emoji-picker");
+
+async function emoji() {
+  return new Promise(async (resolve) => {
+    document.getElementById("msginp").focus();
+    if (commandsOpened) {
+      await commandList();
+    }
+    if (emojiOpened == false) {
+      emojiOpened = true;
+      let chooser = document.createElement("div");
+      chooser.classList = "emoji-chooser";
+      let list = "";
+      allEmojis.forEach((emoji) => {
+        list += `<img src='${emoji.url}'  class='list-item' onclick='emojiClick("${emoji.name}")'>`;
+      });
+      chooser.innerHTML = list;
+      chooser.id = "emojiChooser";
+      let nav = document.getElementById("bottom-nav");
+      document.body.appendChild(chooser);
       setTimeout(() => {
-        chooser.remove();
-      }, 75);
-    }, 125);
-  }
+        nav.classList.add("nav-emoji-picker");
+        resolve();
+      }, 50);
+    } else {
+      emojiOpened = false;
+      let chooser = document.getElementById("emojiChooser");
+      let nav = document.getElementById("bottom-nav");
+      chooser.style.animation = "swipedown 0.4s ease-out";
+      setTimeout(() => {
+        nav.classList.remove("nav-emoji-picker");
+        setTimeout(() => {
+          chooser.remove();
+          resolve();
+        }, 75);
+      }, 125);
+    }
+  });
+}
+
+async function commandList() {
+  document.getElementById("msginp").focus();
+  return new Promise(async (resolve) => {
+    if (emojiOpened) {
+      await emoji();
+    }
+    if (commandsOpened == false) {
+      fetch("/api/commands")
+        .then((res) => res.json())
+        .then((data) => {
+          commandsOpened = true;
+          let chooser = document.createElement("div");
+          chooser.classList = "emoji-chooser";
+          chooser.id = "commandChooser";
+          let list = "";
+          const cats = Object.keys(data);
+          cats.forEach((cat) => {
+            list += `<h3>${cat}</h3>`;
+            data[cat].forEach((cmd) => {
+              list += `<div class='list-item-card' onclick='commandClick("${cmd.usage}")'><b>${cmd.id}</b><p>${cmd.description}</p></div>`;
+            });
+          });
+          chooser.innerHTML = list;
+          let nav = document.getElementById("bottom-nav");
+          document.body.appendChild(chooser);
+          setTimeout(() => {
+            nav.classList.add("nav-emoji-picker");
+            resolve();
+          }, 50);
+        });
+    } else {
+      commandsOpened = false;
+      let chooser = document.getElementById("commandChooser");
+      let nav = document.getElementById("bottom-nav");
+      chooser.style.animation = "swipedown 0.4s ease-out";
+      setTimeout(() => {
+        nav.classList.remove("nav-emoji-picker");
+        setTimeout(() => {
+          chooser.remove();
+          resolve();
+        }, 75);
+      }, 125);
+    }
+  });
 }
 
 function emojiClick(name) {
   document.getElementById("msginp").focus();
   document.getElementById("msginp").value += ":" + name + ":";
+}
+
+function commandClick(usage) {
+  document.getElementById("msginp").focus();
+  document.getElementById("msginp").value += "/" + usage;
 }
 
 function removeReply(msg) {
