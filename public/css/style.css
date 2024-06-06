@@ -611,6 +611,7 @@ reply {
   left: 0;
   display: flex;
   z-index: 1000;
+  -webkit-app-region: drag;
 }
 
 .drag-bar .buttons {
@@ -620,6 +621,8 @@ reply {
   position: absolute;
   top: 0;
   right: 0;
+  -webkit-app-region: no-drag;
+
 }
 
 .drag-bar .buttons div {
@@ -632,6 +635,7 @@ reply {
   justify-content: center;
   font-size: 18px;
   font-weight: bold;
+  -webkit-app-region: no-drag;
 }
 
 .drag-bar .buttons div:hover {
