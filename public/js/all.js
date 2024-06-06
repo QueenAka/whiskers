@@ -97,3 +97,38 @@ function popup(txt) {
     }, 125);
   }, 1500);
 }
+
+const userAgent = navigator.userAgent;
+if (userAgent.includes("WhiskersDesktop")) {
+  const dragBar = document.createElement("div");
+  dragBar.classList = "drag-bar";
+  document.querySelector("html").classList.add("desktopApp");
+
+  const buttons = document.createElement("div");
+  buttons.classList = "buttons";
+
+  const min = document.createElement("div");
+  min.innerHTML = "–";
+  min.addEventListener("click", () => {
+    window.electronAPI.minimize();
+  });
+
+  const max = document.createElement("div");
+  max.innerHTML = "◻";
+  max.addEventListener("click", () => {
+    window.electronAPI.maximize();
+  });
+
+  const close = document.createElement("div");
+  close.innerHTML = "×";
+  close.classList = "close";
+  close.addEventListener("click", () => {
+    window.electronAPI.close();
+  });
+
+  buttons.appendChild(min);
+  buttons.appendChild(max);
+  buttons.appendChild(close);
+  dragBar.appendChild(buttons);
+  document.body.appendChild(dragBar);
+}

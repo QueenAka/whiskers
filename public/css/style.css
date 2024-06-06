@@ -47,6 +47,10 @@ html {
   overflow-x: hidden;
 }
 
+html.desktopApp {
+  height: calc(100% - 30px);
+}
+
 button {
   background-color: var(--sp);
   border: none;
@@ -95,10 +99,13 @@ nav {
   color: var(--t);
 }
 
+.desktopApp nav {
+  top: 30px;
+}
+
 nav img {
   width: 30px;
   height: 30px;
-  
 }
 
 nav a:hover {
@@ -148,6 +155,10 @@ nav a {
 .center {
   margin-top: 100px;
   color: var(--t);
+}
+
+.desktopApp .center {
+  margin-top: 130px;
 }
 
 .user {
@@ -218,6 +229,11 @@ nav a {
   overflow-x: hidden;
 }
 
+.desktopApp #log {
+  margin-top: 80px;
+  height: calc(100vh - 132px);
+}
+
 .msg, .msgr {
   padding: 0px 5px;
   margin: 0;
@@ -269,12 +285,20 @@ spoiler[clicked=true]{
   transform: translateX(-50%);
 }
 
+.desktopApp .sttn {
+  top: 90px;
+}
+
 .lgin {
   width: 300px;
   position: absolute;
   left: 50%;
   top: 100px;
   transform: translateX(-50%);
+}
+
+.desktopApp .lgin {
+  top: 130px;
 }
 
 .lgin button {
@@ -396,6 +420,10 @@ spoiler[clicked=true]{
   animation: fadein 0.1s;
   padding: 2.5px 5px;
   border-radius: 5px;
+}
+
+.desktopApp .notif {
+  top: 105px;
 }
 
 @keyframes fadein {
@@ -522,6 +550,11 @@ reply {
   padding: 0 5px;
 }
 
+.desktopApp .cards {
+  top: 120px;
+  height: calc(100% - 120px);
+}
+
 .chat-card {
   width: calc(100% - 20px);
   border-radius: 10px;
@@ -567,4 +600,77 @@ reply {
 .emoji-chooser .list-item-card p {
   font-size: 14px;
   color: var(--lt);
+}
+
+.drag-bar {
+  width: 100%;
+  height: 30px;
+  background-color: var(--sp);
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  z-index: 1000;
+}
+
+.drag-bar .buttons {
+  width: 90px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.drag-bar .buttons div {
+  width: 30px;
+  height: 30px;
+  color: var(--t);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.drag-bar .buttons div:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.drag-bar .buttons div.close:hover {
+  background: red;
+}
+
+.tabs {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background: var(--b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.desktopApp .tabs {
+  top: 80px;
+}
+
+.tab {
+  width: 25%;
+  height: 27px;
+  background: var(--b);
+  font-size: 20px;
+  text-align: center;
+  overflow: hidden;
+  cursor: pointer;
+  border-bottom: 3px var(--b) solid;
+  padding-top: 2px;
+}
+
+.active {
+  border-bottom: 3px var(--sp) solid;
 }
