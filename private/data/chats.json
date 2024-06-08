@@ -4,7 +4,6 @@
     "description": "A general chat for all to talk about anything and everything!",
     "author": "akatech",
     "visibility": { "type": "public" },
-    "joined": [],
     "id": "general"
   }
 }

@@ -1,24 +1,26 @@
 :root {
-  --p: #1e2124;
-  --s: #26292e;
-  --t: #f1f1f1;
-  --lt: #aaaaaa;
-  --b: #131517;
-  --sp: #D80448;
+  --main: #1E2124;
+  --secondary: #26292E;
+  --text: #F1F1F1;
+  --light-text: #AAAAAA;
+  --background: #131517;
+  --highlights: #D80448;
   --warn: #E6D581;
+  --success: #5BBD5B;
+  --danger: #E60B42;
 }
 
 ::-moz-selection {
-  color: var(--t);
-  background: var(--sp);
+  color: var(--text);
+  background: var(--highlights);
   opacity: 0.9;
   padding: 2px;
   border-radius: 3px;
 }
 
 ::selection {
-  color: var(--t);
-  background: var(--sp);
+  color: var(--text);
+  background: var(--highlights);
   opacity: 0.9;
   padding: 2px;
   border-radius: 3px;
@@ -30,20 +32,20 @@
   transition: all 0.1s ease-in-out;
   outline: none;
   scroll-behavior: smooth;
-  color: var(--t);
+  color: var(--text);
   user-select: none;
 }
 
 reply {
   font-size: 12px;
   marin-bottom: 1px;
-  color: var(--sp);
+  color: var(--highlights);
 }
 
 html {
   height: 100%;
   width: 100%;
-  background-color: var(--p);
+  background-color: var(--main);
   overflow-x: hidden;
 }
 
@@ -52,14 +54,14 @@ html.desktopApp {
 }
 
 button {
-  background-color: var(--sp);
+  background-color: var(--highlights);
   border: none;
   border-radius: 5px;
   padding: 5px;
   cursor: pointer;
   min-width: 75px;
   font-weight: bold;
-  color: var(--t);
+  color: var(--text);
 }
 
 button:active {
@@ -67,7 +69,7 @@ button:active {
 }
 
 input[type=text], input[type=color], select, option, input[type=password] {
-  background-color: var(--s);
+  background-color: var(--secondary);
   border: none;
   border-radius: 5px;
   padding: 5px;
@@ -75,19 +77,19 @@ input[type=text], input[type=color], select, option, input[type=password] {
   width: 200px;
   font-weight: bold;
   margin: 5px;
-  color: var(--t);
+  color: var(--text);
 }
 
 input[type=text]:focus, input[type=password]:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--sp);
-  color: var(--t);
+  box-shadow: 0 0 0 2px var(--highlights);
+  color: var(--text);
 }
 
 nav {
   height: 50px;
   width: 100%;
-  background-color: var(--sp);
+  background-color: var(--highlights);
   position: fixed;
   top: 0;
   left: 0;
@@ -96,7 +98,7 @@ nav {
   justify-content: center;
   font-weight: bold;
   z-index: 999;
-  color: var(--t);
+  color: var(--text);
 }
 
 .desktopApp nav {
@@ -114,7 +116,7 @@ nav a:hover {
 
 nav a {
   text-decoration: none;
-  color: var(--t);
+  color: var(--text);
 }
   
 #home {
@@ -124,18 +126,18 @@ nav a {
   justify-content: center;
   font-weight: bold;
   display: flex;
-  color: var(--t);
+  color: var(--text);
 }
 
 .lined {
   text-align: center;
   position: relative;
   font-size: 30px;
-  background-color: var(--p);
+  background-color: var(--main);
   width: fit-content;
   padding: 10px;
   font-weight: bold;
-  color: var(--t);
+  color: var(--text);
 }
 
 .lined::after {
@@ -143,18 +145,18 @@ nav a {
   display: block;
   width: 100vw;
   height: 3px;
-  background-color: var(--t);
+  background-color: var(--text);
   position: absolute;
   bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
   z-index: -1;
-  color: var(--t);
+  color: var(--text);
 }
 
 .center {
   margin-top: 100px;
-  color: var(--t);
+  color: var(--text);
 }
 
 .desktopApp .center {
@@ -164,39 +166,39 @@ nav a {
 .user {
   position: fixed;
   left: 10px;
-  color: var(--t);
+  color: var(--text);
 }
 
 .settings {
   position: fixed;
   right: 10px;
-  color: var(--t);
+  color: var(--text);
 }
 
 .logo {
   width: 30px;
   height: 30px;
   margin: 5px;
-  color: var(--t);
+  color: var(--text);
 }
 
 .bottom-nav {
   position: relative;
   width: 100%;
   height: 50px;
-  background-color: var(--b);
+  background-color: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--t);
+  color: var(--text);
   z-index: 99999999999999;
-  border-top: 2px solid var(--sp);
+  border-top: 2px solid var(--highlights);
 }
 
 #msginp {
   width: calc(100% - 137.5px);
   height: 20px;
-  color: var(--t);
+  color: var(--text);
   border-radius: 5px;
 }
 
@@ -212,8 +214,8 @@ nav a {
   width: 20px;
   height: 20px;
   padding: 5px;
-  color: var(--t);
-  background: var(--sp);
+  color: var(--text);
+  background: var(--highlights);
   border-radius: 5px;
 }
 
@@ -242,7 +244,7 @@ nav a {
   cursor: normal;
   position: relative;
   height: fit-content;
-  color: var(--t);
+  color: var(--text);
 }
 
 .top {
@@ -251,19 +253,19 @@ nav a {
 
 
 .msg:hover, .msgr:hover {
-  background-color: var(--b);
+  background-color: var(--background);
 }
 
 a {
-  color: var(--sp);
+  color: var(--highlights);
 }
 
 .lt {
-  color: var(--lt);
+  color: var(--light-text);
 }
 
 spoiler {
-  background-color: var(--t);
+  background-color: var(--text);
   padding: 2px;
   border-radius: 3px;
   cursor: pointer;
@@ -333,14 +335,14 @@ spoiler[clicked=true]{
   border: none;
   height: 20px;
   width: 45px;
-  background: var(--p);
+  background: var(--main);
   border-radius: 5px 5px 0 0;
   padding: 1px 5px;
-  border-left: 2px solid var(--t);
-  border-top: 2px solid var(--t);
-  border-right: 2px solid var(--t);
+  border-left: 2px solid var(--text);
+  border-top: 2px solid var(--text);
+  border-right: 2px solid var(--text);
   text-align: center;
-  color: var(--t);
+  color: var(--text);
 }
 
 .msgr:hover::before {
@@ -351,14 +353,14 @@ spoiler[clicked=true]{
   border: none;
   height: 20px;
   width: 45px;
-  background: var(--p);
+  background: var(--main);
   border-radius: 0 0 5px 5px;
   padding: 1px 5px;
-  border-left: 2px solid var(--t);
-  border-bottom: 2px solid var(--t);
+  border-left: 2px solid var(--text);
+  border-bottom: 2px solid var(--text);
   text-align: center;
-  border-right: 2px solid var(--t);
-  color: var(--t);
+  border-right: 2px solid var(--text);
+  color: var(--text);
   z-index: 99;
 }
 
@@ -369,17 +371,17 @@ spoiler[clicked=true]{
   border: none;
   height: 20px;
   width: 45px;
-  background: var(--p);
+  background: var(--main);
   border-radius: 5px 5px 0 0;
   padding: 1px 5px;
-  border-left: 2px solid var(--t);
-  border-top: 2px solid var(--t);
-  border-right: 2px solid var(--t);
+  border-left: 2px solid var(--text);
+  border-top: 2px solid var(--text);
+  border-right: 2px solid var(--text);
   text-align: center;
   z-index: 99;
   opacity: 0;
   user-select: none;
-  color: var(--t);
+  color: var(--text);
 }
 
 .copy {
@@ -389,16 +391,16 @@ spoiler[clicked=true]{
   border: none;
   height: 20px;
   width: 45px;
-  background: var(--p);
+  background: var(--main);
   border-radius: 0 0 5px 5px;
   padding: 1px 5px;
-  border-left: 2px solid var(--t);
-  border-bottom: 2px solid var(--t);
+  border-left: 2px solid var(--text);
+  border-bottom: 2px solid var(--text);
   text-align: center;
   z-index: 99;
   opacity: 0;
   user-select: none;
-  color: var(--t);
+  color: var(--text);
 }
 
 .notif {
@@ -410,10 +412,10 @@ spoiler[clicked=true]{
   max-width: 275px;
   min-height: 30px;
   max-height: 100px;
-  background-color: var(--p);
+  background-color: var(--main);
   display: flex;
   align-items: center;
-  color: var(--t);
+  color: var(--text);
   justify-content: center;
   font-weight: bold;
   z-index: 999;
@@ -439,14 +441,14 @@ spoiler[clicked=true]{
   position: fixed;
   bottom: 50px;
   right: 0px;
-  background-color: var(--b);
+  background-color: var(--background);
   height: 120px;
   width: 200px;
   border-radius: 10px 0 0 0;
   overflow: auto;
   animation: swipeup 0.2s ease-out;
-  border-top: 2px solid var(--sp);
-  border-left: 2px solid var(--sp);
+  border-top: 2px solid var(--highlights);
+  border-left: 2px solid var(--highlights);
   scrollbar-width: none;
   z-index: 99999999999;
 }
@@ -458,7 +460,7 @@ spoiler[clicked=true]{
 }
 
 .list-item:hover {
-  background: var(--p);
+  background: var(--main);
 }
 
 .list-item:active {
@@ -484,7 +486,7 @@ spoiler[clicked=true]{
   top: -2px;
   right: 0;
   height: 2px;
-  background: var(--b);
+  background: var(--background);
   z-index: 999999999999999;
 }
 
@@ -526,7 +528,7 @@ warn {
 }
 
 reply * {
-  color: var(--sp);
+  color: var(--highlights);
 }
 
 reply {
@@ -559,30 +561,58 @@ reply {
   width: calc(100% - 20px);
   border-radius: 10px;
   padding: 10px;
-  background-color: var(--b);
+  background-color: var(--background);
 }
 
 .chat-card .head {
   width: 100%;
   display: flex;
+  justify-content: left;
   align-items: center;
-  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .chat-card .head .name {
+  margin: 0;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chat-card .head .name * {
   margin: 0;
 }
 
 .chat-card .head .author {
   margin: 0 5px;
-  color: var(--lt);
+  color: var(--light-text);
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chat-card .head .author * {
+  margin: 0;
+}
+
+.chat-card .desc {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chat-card .desc * {
+  margin: 0;
 }
 
 .emoji-chooser h3 {
   font-size: 18px;
-  color: var(--lt);
+  color: var(--light-text);
   margin: 5px;
-  border-bottom: 2px solid var(--lt);
+  border-bottom: 2px solid var(--light-text);
 }
 
 .emoji-chooser .list-item-card {
@@ -590,7 +620,7 @@ reply {
   margin: 5px;
   padding: 5px;
   border-radius: 5px;
-  background-color: var(--p);
+  background-color: var(--main);
 }
 
 .emoji-chooser .list-item-card b {
@@ -599,13 +629,13 @@ reply {
 
 .emoji-chooser .list-item-card p {
   font-size: 14px;
-  color: var(--lt);
+  color: var(--light-text);
 }
 
 .drag-bar {
   width: 100%;
   height: 30px;
-  background-color: var(--sp);
+  background-color: var(--highlights);
   position: fixed;
   top: 0;
   left: 0;
@@ -614,45 +644,13 @@ reply {
   -webkit-app-region: drag;
 }
 
-.drag-bar .buttons {
-  width: 90px;
-  display: flex;
-  align-items: center;
-  position: absolute;
-  top: 0;
-  right: 0;
-  -webkit-app-region: no-drag;
-
-}
-
-.drag-bar .buttons div {
-  width: 30px;
-  height: 30px;
-  color: var(--t);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  -webkit-app-region: no-drag;
-}
-
-.drag-bar .buttons div:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.drag-bar .buttons div.close:hover {
-  background: red;
-}
-
 .tabs {
   position: fixed;
   top: 50px;
   left: 0;
   width: 100%;
   height: 30px;
-  background: var(--b);
+  background: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -666,15 +664,24 @@ reply {
 .tab {
   width: 25%;
   height: 27px;
-  background: var(--b);
+  background: var(--background);
   font-size: 20px;
   text-align: center;
   overflow: hidden;
   cursor: pointer;
-  border-bottom: 3px var(--b) solid;
+  border-bottom: 3px var(--background) solid;
   padding-top: 2px;
 }
 
 .active {
-  border-bottom: 3px var(--sp) solid;
+  border-bottom: 3px var(--highlights) solid;
+}
+
+code {
+  background: var(--background);
+  color: var(--light-text);
+  font-family: monospace;
+  padding: 2px;
+  border-radius: 2px;
+  margin: 0 2px !important;
 }

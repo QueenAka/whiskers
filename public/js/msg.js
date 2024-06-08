@@ -153,16 +153,6 @@ fetch("/api/settings", {
             addSymbol(":");
           }
         });
-
-        allEmojis = [];
-
-        fetch("/api/emojis")
-          .then((res) => res.json())
-          .then((emojis) => {
-            emojis.forEach((emoji) => {
-              allEmojis.push(emoji);
-            });
-          });
       }
     } else {
       goto("/pages/user?r=" + window.location.href);
@@ -330,51 +320,6 @@ function resetTimer() {
   msgTimeout = setTimeout(() => {
     lastUser = null;
   }, 60000);
-}
-
-function clean(msg) {
-  const emojiRegex = /:.*?:/g;
-  const linkRegex = /(https?:\/\/[^\s]+)/g;
-  const headerRegex = /^(#{1,6})\s+(.*)$/gm;
-  const replyRegex = /\{.*?\}/g;
-  const italicsRegex = /\*(.*?)\*/g;
-  const boldRegex = /\*\*(.*?)\*\*/g;
-  const strikethroughRegex = /~~(.*?)~~/g;
-  const underlineRegex = /_(.*?)_/g;
-  const id = Math.floor(Math.random() * 100000000);
-  msg = msg.replace(/</g, "&lt;");
-  msg = msg.replace(headerRegex, function (match, p1, p2) {
-    let level = p1.length;
-    let tag = `<h${level}>${p2}</h${level}>`;
-    return tag;
-  });
-  msg = msg.replace(emojiRegex, function (name) {
-    const emoji = allEmojis.find((emoji) => emoji.name == name.slice(1, -1));
-    if (emoji) {
-      return `<img class="emoji" src="${emoji.url}" alt="${emoji.name}">`;
-    }
-    return name;
-  });
-  msg = msg.replace(linkRegex, `<a href="$1" target="_blank">$1</a>`);
-  msg = msg.replace(boldRegex, "<b>$1</b>");
-  msg = msg.replace(italicsRegex, "<i>$1</i>");
-  msg = msg.replace(strikethroughRegex, "<del>$1</del>");
-  msg = msg.replace(underlineRegex, "<u>$1</u>");
-  msg = msg.replace(replyRegex, function (match) {
-    let msgId = match.replace("{", "").replace("}", "");
-    let doc = document.getElementById(msgId);
-    if (!doc) {
-      return match;
-    } else {
-      let txt = doc.innerHTML;
-      lastUser = null;
-      return `<a href="#${msgId}" onclick="highlight('${msgId}')" class="replyBlock"><reply>Replying to ${removeReply(
-        txt,
-      )}</reply></a>`;
-    }
-  });
-  msg = msg.replace("\\", "<span class='none'>\\</span>");
-  return msg;
 }
 
 function formateDate(date) {

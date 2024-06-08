@@ -1,4 +1,5 @@
 const accountName = localStorage.getItem("account");
+let allEmojis = [];
 fetch("/api/settings", {
   method: "POST",
   headers: {
@@ -26,63 +27,16 @@ fetch("/api/settings", {
     }
   });
 
+fetch("/api/emojis")
+  .then((res) => res.json())
+  .then((emojis) => {
+    emojis.forEach((emoji) => {
+      allEmojis.push(emoji);
+    });
+  });
+
 function goto(url) {
   window.location.href = url;
-}
-
-class DependableVariables {
-  constructor(v) {
-    if (!v) return null;
-    const varAndArg = v.split(".");
-    const varName = varAndArg[0];
-    varAndArg.splice(0, 1);
-    const arg = varAndArg;
-    this[varName](arg);
-  }
-
-  chat(args) {
-    if (args[0] == "name") {
-      const id = window.location.href.split("/chat/")[0];
-      if (id) {
-        fetch(`/api/chats/${id}`)
-          .then((res) => res.json())
-          .then((data) => {
-            return data.name;
-          });
-      } else {
-        return null;
-      }
-    } else if (args[0] == "owner") {
-      const id = window.location.href.split("/chat/")[0];
-      if (id) {
-        fetch(`/api/chat/${id}/settings`)
-          .then((res) => res.json())
-          .then((data) => {
-            return data.author;
-          });
-      } else {
-        return null;
-      }
-    } else if (args[0] == "id") {
-      const id = window.location.href.split("/chat/")[0];
-      if (id) {
-        return id;
-      } else {
-        return null;
-      }
-    } else if (args[0] == "settings") {
-      const id = window.location.href.split("/chat/")[0];
-      if (id) {
-        fetch(`/api/chat/${id}/settings`)
-          .then((res) => res.json())
-          .then((data) => {
-            return data;
-          });
-      } else {
-        return null;
-      }
-    }
-  }
 }
 
 function popup(txt) {
@@ -103,32 +57,52 @@ if (userAgent.includes("WhiskersDesktop")) {
   const dragBar = document.createElement("div");
   dragBar.classList = "drag-bar";
   document.querySelector("html").classList.add("desktopApp");
-
-  const buttons = document.createElement("div");
-  buttons.classList = "buttons";
-
-  const min = document.createElement("div");
-  min.innerHTML = "–";
-  min.addEventListener("click", () => {
-    window.electronAPI.minimize();
-  });
-
-  const max = document.createElement("div");
-  max.innerHTML = "◻";
-  max.addEventListener("click", () => {
-    window.electronAPI.maximize();
-  });
-
-  const close = document.createElement("div");
-  close.innerHTML = "×";
-  close.classList = "close";
-  close.addEventListener("click", () => {
-    window.electronAPI.close();
-  });
-
-  buttons.appendChild(min);
-  buttons.appendChild(max);
-  buttons.appendChild(close);
-  dragBar.appendChild(buttons);
   document.body.appendChild(dragBar);
+}
+
+function clean(msg) {
+  const codeRegex = /`(.*?)`/g;
+  const emojiRegex = /:(.*?):/g;
+  const linkRegex = /(https?:\/\/[^\s]+)/g;
+  const headerRegex = /^(#{1,6})\&nbsp\;(.*)$/gm;
+  const replyRegex = /\{.*?\}/g;
+  const italicsRegex = /\*(.*?)\*/g;
+  const boldRegex = /\*\*(.*?)\*\*/g;
+  const strikethroughRegex = /~~(.*?)~~/g;
+  const underlineRegex = /_(.*?)_/g;
+  msg = msg.replace(/\s/g, "&nbsp;");
+  msg = msg.replace(/</g, "&lt;");
+  msg = msg.replace(headerRegex, function (match, p1, p2) {
+    let level = p1.length;
+    let tag = `<h${level}>${p2}</h${level}>`;
+    return tag;
+  });
+  msg = msg.replace(emojiRegex, function (name) {
+    const emoji = allEmojis.find((emoji) => emoji.name == name.slice(1, -1));
+    if (emoji)
+      return `<img class="emoji" src="${emoji.url}" alt="${emoji.name}">`;
+    return name;
+  });
+  msg = msg.replace(codeRegex, `<code>$1</code>`);
+  msg = msg.replace(linkRegex, `<a href="$1" target="_blank">$1</a>`);
+  msg = msg.replace(boldRegex, "<b>$1</b>");
+  msg = msg.replace(italicsRegex, "<i>$1</i>");
+  msg = msg.replace(strikethroughRegex, "<s>$1</s>");
+  msg = msg.replace(underlineRegex, "<u>$1</u>");
+  msg = msg.replace(replyRegex, function (match) {
+    let msgId = match.replace("{", "").replace("}", "");
+    let doc = document.getElementById(msgId);
+    if (!doc) {
+      return match;
+    } else {
+      let txt = doc.innerHTML;
+      lastUser = null;
+      return `<a href="#${msgId}" onclick="highlight('${msgId}')" class="replyBlock"><reply>Replying to ${removeReply(
+        txt,
+      )}</reply></a>`;
+    }
+  });
+  msg = msg.replace(/\\/g, "<span class='none'>\\</span>");
+  msg = msg.replace(/\n/g, "<br>");
+  return msg;
 }

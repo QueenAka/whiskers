@@ -288,6 +288,13 @@ app.get("/api/commands", async (req, res) => {
   res.json(commands);
 });
 
+app.get("/api/updates", async (req, res) => {
+  const updates = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "private/data/updates.json"), "utf-8"),
+  );
+  res.json(updates.reverse());
+});
+
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, "private/html/404.html"));
 });

@@ -31,43 +31,39 @@
         src="/media/image/icons/settings.png"
       />
     </nav>
-    <style>
-      .tabs {
-        position: fixed;
-        top: 50px;
-        left: 0;
-        width: 100%;
-        height: 30px;
-        background: var(--b);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .tab {
-        width: 25%;
-        height: 27px;
-        background: var(--b);
-        font-size: 20px;
-        text-align: center;
-        overflow: hidden;
-        cursor: pointer;
-        border-bottom: 3px var(--b) solid;
-        padding-top: 2px;
-      }
-
-      .active {
-        border-bottom: 3px var(--sp) solid;
-      }
-    </style>
     <div class="tabs">
-      <div class="tab active" id="pc" onclick="select(this.id)">Public</div>
-      <div class="tab" id="jac" onclick="select(this.id)">Join</div>
-      <div class="tab" id="cac" onclick="select(this.id)">Create</div>
-      <div class="tab" id="jc" onclick="select(this.id)">Joined</div>
+      <div
+        class="tab active"
+        id="tab-news"
+        onclick="select(this.id.split('-')[1])"
+      >
+        News
+      </div>
+      <div
+        class="tab"
+        id="tab-publicChats"
+        onclick="select(this.id.split('-')[1])"
+      >
+        Public
+      </div>
+      <div
+        class="tab"
+        id="tab-joinChat"
+        onclick="select(this.id.split('-')[1])"
+      >
+        Join
+      </div>
+      <div
+        class="tab"
+        id="tab-createChat"
+        onclick="select(this.id.split('-')[1])"
+      >
+        Create
+      </div>
     </div>
-    <div id="spc" class="cards"></div>
-    <div id="sjac" style="display: none">
+    <div id="news" class="cards"></div>
+    <div id="publicChats" class="cards" style="display: none"></div>
+    <div id="joinChat" style="display: none">
       <center class="center">
         <h3>Join a Chat</h3>
         <input placeholder="Chat ID..." type="text" id="joinId" />
@@ -78,7 +74,7 @@
         </button>
       </center>
     </div>
-    <div id="scac" style="display: none">
+    <div id="createChat" style="display: none">
       <center class="center">
         <h2>Create a Chat</h2>
         <h3>Chat Name</h3>
@@ -86,59 +82,95 @@
         <warn>THIS DOES NOT CURRENTLY DO ANYTHING</warn>
       </center>
     </div>
-    <div id="sjc" style="display: none">
-      <center class="center">
-        <h3 class="lt">None yet...</h3>
-      </center>
-    </div>
     <script src="/js/all.js"></script>
     <script>
       function select(id) {
-        document.getElementById("pc").classList.remove("active");
-        document.getElementById("jac").classList.remove("active");
-        document.getElementById("cac").classList.remove("active");
-        document.getElementById("jc").classList.remove("active");
-        document.getElementById("spc").style.display = "none";
-        document.getElementById("sjac").style.display = "none";
-        document.getElementById("scac").style.display = "none";
-        document.getElementById("sjc").style.display = "none";
-        document.getElementById(id).classList.add("active");
-        document.getElementById("s" + id).style.display = "block";
+        const tabs = [
+          "tab-news",
+          "tab-publicChats",
+          "tab-joinChat",
+          "tab-createChat",
+        ];
+        tabs.forEach((tabId) =>
+          document.getElementById(tabId).classList.remove("active"),
+        );
+        const contentIds = ["news", "publicChats", "joinChat", "createChat"];
+        contentIds.forEach(
+          (contentId) =>
+            (document.getElementById(contentId).style.display = "none"),
+        );
+        const selectedTabId = `tab-${id}`;
+        const selectedContentId = id;
+        document.getElementById(selectedTabId).classList.add("active");
+        document.getElementById(selectedContentId).style.display = "block";
       }
 
-      fetch("/api/chats")
-        .then((res) => res.json())
-        .then((data) => {
-          data.forEach((chat) => {
-            const chatDiv = document.createElement("div");
-            chatDiv.classList.add("chat-card");
+      setTimeout(() => {
+        fetch("/api/updates")
+          .then((res) => res.json())
+          .then((data) => {
+            data.forEach((update) => {
+              const updateDiv = document.createElement("div");
+              updateDiv.classList.add("chat-card");
 
-            const chatHead = document.createElement("div");
-            chatHead.classList.add("head");
+              const updateHead = document.createElement("div");
+              updateHead.classList.add("head");
 
-            const chatTitle = document.createElement("h3");
-            chatTitle.innerText = chat.name;
-            chatTitle.classList = "name";
+              const updateTitle = document.createElement("h3");
+              updateTitle.innerHTML = clean(update.name);
+              updateTitle.classList = "name";
 
-            const chatAuthor = document.createElement("p");
-            chatAuthor.innerText = `@${chat.author}`;
-            chatAuthor.classList = "author";
+              const updateTimestamp = document.createElement("p");
+              updateTimestamp.innerHTML = `${update.timestamp}`;
+              updateTimestamp.classList = "author";
 
-            chatHead.appendChild(chatTitle);
-            chatHead.appendChild(chatAuthor);
+              updateHead.appendChild(updateTitle);
+              updateHead.appendChild(updateTimestamp);
 
-            const chatDescription = document.createElement("p");
-            chatDescription.innerText = chat.description;
-            chatDescription.classList = "desc";
+              const updateDescription = document.createElement("p");
+              updateDescription.innerHTML = clean(update.description);
+              updateDescription.classList = "desc";
 
-            chatDiv.appendChild(chatHead);
-            chatDiv.appendChild(chatDescription);
-            chatDiv.onclick = () => {
-              goto(`/chats/${chat.id}`);
-            };
-            document.getElementById("spc").appendChild(chatDiv);
+              updateDiv.appendChild(updateHead);
+              updateDiv.appendChild(updateDescription);
+              document.getElementById("news").appendChild(updateDiv);
+            });
           });
-        });
+
+        fetch("/api/chats")
+          .then((res) => res.json())
+          .then((data) => {
+            data.forEach((chat) => {
+              const chatDiv = document.createElement("div");
+              chatDiv.classList.add("chat-card");
+
+              const chatHead = document.createElement("div");
+              chatHead.classList.add("head");
+
+              const chatTitle = document.createElement("h3");
+              chatTitle.innerHTML = clean(chat.name);
+              chatTitle.classList = "name";
+
+              const chatAuthor = document.createElement("p");
+              chatAuthor.innerHTML = `@${chat.author}`;
+              chatAuthor.classList = "author";
+
+              chatHead.appendChild(chatTitle);
+              chatHead.appendChild(chatAuthor);
+
+              const chatDescription = document.createElement("p");
+              chatDescription.innerHTML = clean(chat.description);
+              chatDescription.classList = "desc";
+
+              chatDiv.appendChild(chatHead);
+              chatDiv.appendChild(chatDescription);
+              chatDiv.onclick = () => {
+                goto(`/chats/${chat.id}`);
+              };
+              document.getElementById("publicChats").appendChild(chatDiv);
+            });
+          });
+      }, 500);
     </script>
   </body>
 </html>
