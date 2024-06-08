@@ -60,6 +60,12 @@ if (userAgent.includes("WhiskersDesktop")) {
   document.body.appendChild(dragBar);
 }
 
+const mobileRegex =
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Nokia|SonyEricsson|SCH-M\d+|Windows CE|SymbianOS|PlayBook|Silk|Kindle|Bolt|Iris|UCWEB|Series40|S40OviBrowser|XBLWP|Dell|LGE|Lenovo|MobiFire|NetFront|LG|NEC-ASPIRE|Alcatel|ZTE|Toshiba|Huawei|Coolpad|LeEco|Vivo|OPPO|OnePlus|Meizu|Google|Pixel|Galaxy|Nexus|ASUS|Panasonic|HTC|Motorola|Razer|Yulong|Umidigi|Flyme|HarmonyOS|Honor|Realme|Vsmart|IQOO|Redmi|Mi|Blu|ZTE|Hisense|Infinix|Tecno|Nubia|Smartisan|Gionee/;
+if (mobileRegex.test(userAgent)) {
+  document.querySelector("html").classList.add("mobile");
+}
+
 function clean(msg) {
   const codeRegex = /`(.*?)`/g;
   const emojiRegex = /:(.*?):/g;
@@ -70,7 +76,6 @@ function clean(msg) {
   const boldRegex = /\*\*(.*?)\*\*/g;
   const strikethroughRegex = /~~(.*?)~~/g;
   const underlineRegex = /_(.*?)_/g;
-  msg = msg.replace(/\s/g, "&nbsp;");
   msg = msg.replace(/</g, "&lt;");
   msg = msg.replace(headerRegex, function (match, p1, p2) {
     let level = p1.length;

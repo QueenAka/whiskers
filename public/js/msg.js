@@ -43,85 +43,8 @@ fetch("/api/settings", {
           .then((res) => res.json())
           .then((data) => {
             client = new EventSource(`/events/get?id=${data.id}`);
-            client.addEventListener("message", function (event) {
-              let message = JSON.parse(event.data);
-              if (
-                message.type == "messageCreate" &&
-                message.url == window.location.href
-              ) {
-                let msgId = message.id;
-                resetTimer();
-                messageData = JSON.parse(message.data);
-                console.log(messageData);
-                let username = messageData.author.username;
-                if (username == "[SERVER]") username = message.id;
-                let displayName = messageData.author.displayName;
-                let appendUser = username != lastUser;
-                lastUser = username;
-                if (displayName == null) {
-                  displayName = clean(messageData.content);
-                  messageData.content = "";
-                }
-                const messages = document.getElementById("log");
-                const msgDiv = document.createElement("div");
-                msgDiv.classList.add("msgr");
-                msgDiv.id = `msg-${msgId}`;
-
-                const topDiv = document.createElement("div");
-                topDiv.classList.add("top");
-
-                const authorSpan = document.createElement("b");
-                authorSpan.id = msgId;
-                authorSpan.innerHTML = displayName;
-
-                const dateSpan = document.createElement("span");
-                dateSpan.classList.add("lt");
-                dateSpan.innerHTML = ` ${formateDate(new Date())}`;
-
-                topDiv.appendChild(authorSpan);
-                topDiv.appendChild(dateSpan);
-                topDiv.innerHTML += "<br>";
-
-                if (appendUser) msgDiv.appendChild(topDiv);
-
-                const bottomSpan = document.createElement("span");
-                bottomSpan.classList.add("messageContent");
-                bottomSpan.innerHTML = clean(messageData.content);
-
-                const replyDiv = document.createElement("div");
-                replyDiv.classList.add("reply");
-                replyDiv.innerHTML = "Reply";
-                replyDiv.onclick = function () {
-                  reply(msgId);
-                };
-
-                const copyDiv = document.createElement("div");
-                copyDiv.classList.add("copy");
-                copyDiv.innerHTML = "Copy";
-                copyDiv.onclick = function () {
-                  copy(removeReply(messageData.content));
-                };
-
-                const bottomDiv = document.createElement("div");
-                bottomDiv.appendChild(bottomSpan);
-                bottomDiv.appendChild(replyDiv);
-                bottomDiv.appendChild(copyDiv);
-                msgDiv.appendChild(bottomDiv);
-                messages.appendChild(msgDiv);
-
-                resetTimer();
-
-                aud = "/media/audio/meow.mp3";
-                if (userData.settings.notifSounds != false) {
-                  var audio = new Audio(aud);
-                  audio.loop = false;
-                  audio.play();
-                }
-                messages.scrollTop = messages.scrollHeight;
-              }
-            });
+            client.addEventListener("message", messageReciever);
           });
-
         document.getElementById("msginp").addEventListener("keydown", (e) => {
           function addSymbol(s) {
             l = s.split("").length;
@@ -357,4 +280,63 @@ function notif(txt) {
       notif.remove();
     }, 125);
   }, 1500);
+}
+
+function messageReciever(event) {
+  let message = JSON.parse(event.data);
+  if (message.type == "messageCreate" && message.url == window.location.href) {
+    let msgId = message.id;
+    resetTimer();
+    messageData = JSON.parse(message.data);
+    console.log(messageData);
+    let username = messageData.author.username;
+    if (username == "[SERVER]") username = message.id;
+    let displayName = messageData.author.displayName;
+    let appendUser = username != lastUser;
+    lastUser = username;
+    if (displayName == null) {
+      displayName = clean(messageData.content);
+      messageData.content = "";
+    }
+    const messages = document.getElementById("log");
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("msgr");
+    msgDiv.id = `msg-${msgId}`;
+
+    const topDiv = document.createElement("div");
+    topDiv.classList.add("top");
+
+    const authorSpan = document.createElement("b");
+    authorSpan.id = msgId;
+    authorSpan.innerHTML = displayName;
+
+    const dateSpan = document.createElement("span");
+    dateSpan.classList.add("lt");
+    dateSpan.innerHTML = ` ${formateDate(new Date())}`;
+
+    topDiv.appendChild(authorSpan);
+    topDiv.appendChild(dateSpan);
+    topDiv.innerHTML += "<br>";
+
+    if (appendUser) msgDiv.appendChild(topDiv);
+
+    const bottomSpan = document.createElement("span");
+    bottomSpan.classList.add("messageContent");
+    bottomSpan.innerHTML = clean(messageData.content);
+
+    const bottomDiv = document.createElement("div");
+    bottomDiv.appendChild(bottomSpan);
+    msgDiv.appendChild(bottomDiv);
+    messages.appendChild(msgDiv);
+
+    resetTimer();
+
+    aud = "/media/audio/meow.mp3";
+    if (userData.settings.notifSounds != false) {
+      var audio = new Audio(aud);
+      audio.loop = false;
+      audio.play();
+    }
+    messages.scrollTop = messages.scrollHeight;
+  }
 }
