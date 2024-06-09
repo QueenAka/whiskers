@@ -2,6 +2,14 @@ let userData;
 let uname;
 let dname;
 let lastUser;
+let clientId;
+let msgTimeout = setTimeout(() => {
+  lastUser = null;
+}, 60000);
+let commandsOpened = false;
+let emojiOpened = false;
+let loadingMessages = [];
+
 fetch("/api/settings", {
   method: "POST",
   headers: {
@@ -22,7 +30,6 @@ fetch("/api/settings", {
       userData = data.json;
       if (userData != null) {
         lastUser = null;
-        let client = null;
         uname = accountName;
         dname = userData.settings.displayName;
 
@@ -42,50 +49,46 @@ fetch("/api/settings", {
         })
           .then((res) => res.json())
           .then((data) => {
-            client = new EventSource(`/events/get?id=${data.id}`);
-            client.addEventListener("message", messageReciever);
+            clientId = data.id;
+            startEventFlow();
           });
-        document.getElementById("msginp").addEventListener("keydown", (e) => {
-          function addSymbol(s) {
-            l = s.split("").length;
-            e.preventDefault();
-            let selStart = e.target.selectionStart;
-            let selEnd = e.target.selectionEnd;
-            let text = e.target.value;
-            e.target.value =
-              text.substring(0, selStart) +
-              s +
-              text.substring(selStart, selEnd) +
-              s +
-              text.substring(selEnd);
-            e.target.selectionEnd = selEnd + l;
-            e.target.selectionStart = selStart + l;
-          }
-          if (e.key === "Enter") {
-            e.preventDefault();
-            send();
-          } else if (e.key === "b" && e.ctrlKey) {
-            addSymbol("**");
-          } else if (e.key === "i" && e.ctrlKey) {
-            addSymbol("*");
-          } else if (e.key === "u" && e.ctrlKey) {
-            addSymbol("_");
-          } else if (e.key === "s" && e.ctrlKey) {
-            addSymbol("~~");
-          } else if (e.key === "e" && e.ctrlKey) {
-            addSymbol(":");
-          }
-        });
       }
     } else {
       goto("/pages/user?r=" + window.location.href);
     }
   });
 
-let msgTimeout = setTimeout(() => {
-  lastUser = null;
-  console.log("Resetted");
-}, 60000);
+document.getElementById("msginp").addEventListener("keydown", (e) => {
+  function addSymbol(s) {
+    l = s.split("").length;
+    e.preventDefault();
+    let selStart = e.target.selectionStart;
+    let selEnd = e.target.selectionEnd;
+    let text = e.target.value;
+    e.target.value =
+      text.substring(0, selStart) +
+      s +
+      text.substring(selStart, selEnd) +
+      s +
+      text.substring(selEnd);
+    e.target.selectionEnd = selEnd + l;
+    e.target.selectionStart = selStart + l;
+  }
+  if (e.key === "Enter") {
+    e.preventDefault();
+    send();
+  } else if (e.key === "b" && e.ctrlKey) {
+    addSymbol("**");
+  } else if (e.key === "i" && e.ctrlKey) {
+    addSymbol("*");
+  } else if (e.key === "u" && e.ctrlKey) {
+    addSymbol("_");
+  } else if (e.key === "s" && e.ctrlKey) {
+    addSymbol("~~");
+  } else if (e.key === "e" && e.ctrlKey) {
+    addSymbol(":");
+  }
+});
 
 function highlight(id) {
   document.getElementById("msginp").focus();
@@ -95,9 +98,6 @@ function highlight(id) {
     doc.style.background = "";
   }, 1000);
 }
-
-let commandsOpened = false;
-let emojiOpened = false;
 
 async function emoji() {
   return new Promise(async (resolve) => {
@@ -226,9 +226,11 @@ function send() {
         username: uname,
         displayName: dname,
       },
+      tempId: new Date().getTime(),
     }),
     url: window.location.href.split("#")[0],
   };
+  buildMessage(json, "temp");
   fetch("/events/post", {
     method: "POST",
     headers: {
@@ -282,13 +284,62 @@ function notif(txt) {
   }, 1500);
 }
 
-function messageReciever(event) {
+async function startEventFlow() {
+  return new Promise((resolve) => {
+    let offline, online;
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const client = new EventSource(`/events/get?id=${clientId}`, { signal });
+
+    client.onerror = () => {
+      offline == true;
+      resolve(false);
+    };
+
+    client.onopen = () => {
+      online == true;
+      client.addEventListener("message", messageReceiver);
+      client.addEventListener("error", errorHandler);
+      resolve(true);
+    };
+
+    setTimeout(() => {
+      if (!online || !offline) {
+        controller.abort();
+        resolve(false);
+      }
+    }, 500);
+  });
+}
+
+function messageReceiver(event) {
   let message = JSON.parse(event.data);
   if (message.type == "messageCreate" && message.url == window.location.href) {
+    buildMessage(message, "message");
+  }
+}
+
+async function errorHandler(event) {
+  const online = await startEventFlow();
+  if (!online) {
+    const offlineDiv = document.createElement("div");
+    offlineDiv.id = "offlinePage";
+    offlineDiv.classList.add("offline");
+    offlineDiv.innerHTML =
+      "<center><div class='offline-logo'></div><h3>You are offline! Please connect to the internet and to continue!</h3><button onclick='window.location.reload()'>Reload Page</button></center>";
+    document.body.appendChild(offlineDiv);
+  }
+}
+
+function buildMessage(message, type) {
+  if (type == "message") {
     let msgId = message.id;
-    resetTimer();
     messageData = JSON.parse(message.data);
-    console.log(messageData);
+    if (loadingMessages.includes(messageData.tempId)) {
+      document.getElementById(`temp-${messageData.tempId}`).remove();
+      loadingMessages.splice(loadingMessages.indexOf(messageData.tempId), 1);
+    }
     let username = messageData.author.username;
     if (username == "[SERVER]") username = message.id;
     let displayName = messageData.author.displayName;
@@ -332,11 +383,51 @@ function messageReciever(event) {
     resetTimer();
 
     aud = "/media/audio/meow.mp3";
-    if (userData.settings.notifSounds != false) {
+    if (username != uname) {
       var audio = new Audio(aud);
       audio.loop = false;
       audio.play();
     }
+    messages.scrollTop = messages.scrollHeight;
+  } else if (type == "temp") {
+    let messageData = JSON.parse(message.data);
+    let msgId = messageData.tempId;
+    loadingMessages.push(msgId);
+    let username = messageData.author.username;
+    let displayName = messageData.author.displayName;
+    let appendUser = username != lastUser;
+    const messages = document.getElementById("log");
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("msgr");
+    msgDiv.classList.add("temp");
+    msgDiv.id = `temp-${msgId}`;
+
+    const topDiv = document.createElement("div");
+    topDiv.classList.add("top");
+
+    const authorSpan = document.createElement("b");
+    authorSpan.id = msgId;
+    authorSpan.innerHTML = displayName;
+
+    const dateSpan = document.createElement("span");
+    dateSpan.classList.add("lt");
+    dateSpan.innerHTML = ` ${formateDate(new Date())}`;
+
+    topDiv.appendChild(authorSpan);
+    topDiv.appendChild(dateSpan);
+    topDiv.innerHTML += "<br>";
+
+    if (appendUser) msgDiv.appendChild(topDiv);
+
+    const bottomSpan = document.createElement("span");
+    bottomSpan.classList.add("messageContent");
+    bottomSpan.innerHTML = clean(messageData.content);
+
+    const bottomDiv = document.createElement("div");
+    bottomDiv.appendChild(bottomSpan);
+    msgDiv.appendChild(bottomDiv);
+    messages.appendChild(msgDiv);
+
     messages.scrollTop = messages.scrollHeight;
   }
 }
