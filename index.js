@@ -108,20 +108,6 @@ app.post("/events/post", (req, res) => {
       id: Date.now().toString(),
     };
     sendToClients(JSON.stringify(newJson) + "\n\n", url);
-  } else if (type == "messageDelete") {
-    let newJson = {
-      type: "messageDelete",
-      url: url,
-      data: data,
-    };
-    sendToClients(JSON.stringify(newJson) + "\n\n", url);
-  } else if (type == "messageEdit") {
-    let newJson = {
-      type: "messageEdit",
-      url: url,
-      data: data,
-    };
-    sendToClients(JSON.stringify(newJson) + "\n\n", url);
   } else {
     res.status(400).json({ error: "Invalid type" });
   }

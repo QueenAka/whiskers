@@ -1,8 +1,16 @@
 {
-  "test": {
-    "password": "test",
+  "akatech": {
+    "password": "Gh0407op!",
     "settings": {
-      "displayName": "Test"
+      "displayName": "Aka"
+    },
+    "ownedChats": [],
+    "bannedChats": []
+  },
+  "sploogles": {
+    "password": "push33n3th3cat",
+    "settings": {
+      "displayName": "≡;- ꒰ Corpse ꒱"
     },
     "ownedChats": [],
     "bannedChats": []

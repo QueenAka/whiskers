@@ -42,7 +42,7 @@ function goto(url) {
 function popup(txt) {
   const notif = document.createElement("div");
   notif.classList = "notif";
-  notif.innerHTML = clean(txt);
+  notif.innerHTML = txt;
   document.body.appendChild(notif);
   setTimeout(() => {
     notif.style.opacity = 0;
@@ -102,7 +102,7 @@ function clean(msg) {
     } else {
       let txt = doc.innerHTML;
       lastUser = null;
-      return `<a href="#" onclick="highlight('${msgId}')" class="replyBlock"><reply>Replying to ${removeReply(
+      return `<a href="#${msgId}" onclick="highlight('${msgId}')" class="replyBlock"><reply>Replying to ${removeReply(
         txt,
       )}</reply></a>`;
     }
