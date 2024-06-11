@@ -247,10 +247,6 @@ nav a {
   margin-top: 5px;
 }
 
-.msg:hover, .msgr:hover {
-  background-color: var(--background);
-}
-
 a {
   color: var(--highlights);
 }
@@ -327,6 +323,7 @@ a {
   animation: fadein 0.1s;
   padding: 2.5px 5px;
   border-radius: 5px;
+  box-shadow: 0 0 0 2px var(--text);
 }
 
 .desktopApp .notif {
@@ -613,4 +610,88 @@ code {
 .offline button {
   width: 300px;
   margin-top: 5px;
+}
+
+.rclick {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 150px;
+  background: var(--background);
+  z-index: 500;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.rclick .item {
+  height: 20px;
+  width: calc(100% - 10px);
+  padding: 5px;
+  font-size: 15px;
+  line-height: 20px;
+  position: relative;
+  font-weight: bold;
+}
+
+.rclick .item:hover {
+  background: var(--highlights);
+}
+
+.mobile .rclick .item:hover {
+  background: unset;
+}
+
+.rclick .item:active {
+  background: var(--highlights);
+}
+
+.rclick .item img {
+  width: 20px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.msgr:hover {
+  background: var(--background);
+}
+
+.msgr:active {
+  background: var(--background);
+}
+
+.mobile .msgr:hover {
+  background: unset;
+}
+
+.input-type {
+  background: var(--background);
+  width: calc(100% - 5px);
+  height: 20px;
+  font-size: 15px;
+  position: fixed;
+  bottom: 52px;
+  left: 0;
+  padding: 5px;
+  line-height: 20px;
+}
+
+.input-type span {
+  text-decoration-line: underline;
+  margin-right: 5px;
+  color: var(--highlights);
+}
+
+.input-type span * {
+  color: var(--highlights);
+}
+
+.input-type img {
+  width: 12px;
+  position: absolute;
+  padding: 3px 0 3px 5px;
+  border-left: solid 1px var(--light-text);
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
 }
