@@ -9,6 +9,7 @@
     <meta name="og:image" content="/media/image/icons/logo.png" />
     <link rel="icon" type="image/png" href="/media/image/icons/logo.png" />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/settings.css" />
   </head>
   <body>
     <nav>
@@ -31,38 +32,260 @@
         src="/media/image/icons/settings.png"
       />
     </nav>
-    <div class="sttn">
-      <warn>SETTINGS ARE BEING REWORKED AND DO NOT WORK AS OF NOW</warn>
-      <div class="lined">Account</div>
-      <h3>Display Name:</h3>
-      <input />
-      <h3>Change Username:</h3>
-      <p>New Username</p>
-      <input />
-      <p>Password</p>
-      <input type="password" />
-      <h3>Change Password:</h3>
-      <p>Old Password</p>
-      <input type="password" />
-      <p>New Password</p>
-      <input type="password" />
-      <p>Confirm New Password</p>
-      <input type="password" />
-      <h3>Delete Account:</h3>
-      <p>Password</p>
-      <input type="password" />
-      <button>Delete</button>
-      <div class="lined">Chats</div>
-      <h3>Display user join Messages:</h3>
-      <input type="checkbox" />
-      <h3>Display custom user Name Colors:</h3>
-      <input type="checkbox" />
-      <h3>Display custom user Display Names</h3>
-      <input type="checkbox" />
-      <h3>Play notification Sounds:</h3>
-      <input type="checkbox" />
+    <div class="cards">
+      <div class="chat-card">
+        <div class="head">
+          <h3 class="name">Account</h3>
+        </div>
+        <div class="body" id="account">
+          <img src="/media/image/icons/profile.png" id="pfp" />
+          <div id="account-pfp-change" onclick="imgInput.click()"></div>
+          <input placeholder="Display Name" id="displayName" />
+          <span class="lt" id="username">@test</span>
+          <textarea id="bio" placeholder="Bio"></textarea>
+          <div class="option">
+            <span class="toggle" onclick="toggle('accAdv')"
+              >Advanced
+              <img
+                src="/media/image/icons/down.png"
+                id="accAdv-toggle"
+                class="arrow"
+            /></span>
+            <div id="accAdv-content" class="toggle-content">
+              <div class="option">
+                Name color
+                <img
+                  src="/media/image/icons/context.png"
+                  id="context-nameColor"
+                  class="context"
+                />
+                <input type="color" id="nameColor" />
+              </div>
+              <div class="option">
+                Message sound
+                <img
+                  src="/media/image/icons/context.png"
+                  id="context-messageSound"
+                  class="context"
+                />
+                <select id="messageSound" onchange="displaySound(this.value)">
+                  <option value="/media/audio/meow.mp3">Meow</option>
+                  <option value="/media/audio/bark.mp3">Bark</option>
+                  <option value="/media/audio/ding.mp3">Ding</option>
+                  <option value="/media/audio/woosh.mp3">Woosh</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="option">
+            <span class="toggle" onclick="toggle('password')"
+              >Danger zone
+              <img
+                src="/media/image/icons/down.png"
+                id="password-toggle"
+                class="arrow"
+            /></span>
+            <div id="password-content" class="toggle-content">
+              <div class="option">
+                Delete account
+                <button>Delete</button>
+              </div>
+              <div class="option">
+                Log out
+                <button>Log out</button>
+              </div>
+              <div class="option">
+                Change password
+                <button>Change</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="buttons">
+          <div class="left">
+            <button>Import</button>
+            <button>Export</button>
+          </div>
+          <div class="right">
+            <button onclick="saveSettings('account')">Save</button>
+            <button onclick="resetSettings('account')">Reset</button>
+          </div>
+        </div>
+      </div>
+      <div class="chat-card">
+        <div class="head">
+          <h3 class="name">General</h3>
+        </div>
+        <div class="body">
+          <div class="option">
+            App theme
+            <select id="appTheme" onchange="displayTheme(this.value)">
+              <option value="poppy-seed">Poppy Seed</option>
+              <option value="mint-chip">Mint Chip</option>
+              <option value="tundra">Tundra</option>
+              <option value="lavander">Lavander</option>
+              <option value="pretzel">Pretzel</option>
+              <option value="bubble-gum">Bubble Gum</option>
+              <option value="sunrise">Sunrise</option>
+              <option value="midnight">Midnight</option>
+            </select>
+          </div>
+          <div class="option">
+            Alert messages
+            <img
+              src="/media/image/icons/context.png"
+              class="context"
+              id="context-joinMessages"
+            />
+            <label class="switch">
+              <input type="checkbox" id="joinMessages" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="option">
+            Chat sounds
+            <img
+              src="/media/image/icons/context.png"
+              class="context"
+              id="context-chatSounds"
+            />
+            <label class="switch">
+              <input type="checkbox" id="chatSounds" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="option">
+            Message embeds
+            <img
+              src="/media/image/icons/context.png"
+              class="context"
+              id="context-messageEmbeds"
+            />
+            <label class="switch">
+              <input type="checkbox" id="messageEmbeds" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="option">
+            <span class="toggle" onclick="toggle('access')"
+              >Accessibility
+              <img
+                src="/media/image/icons/down.png"
+                id="access-toggle"
+                class="arrow"
+            /></span>
+            <div id="access-content" class="toggle-content">
+              <div class="option">
+                Show profile pictures
+                <img
+                  src="/media/image/icons/context.png"
+                  class="context"
+                  id="context-showPfps"
+                />
+                <label class="switch">
+                  <input type="checkbox" id="showPfps" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="option">
+                Show name colors
+                <img
+                  src="/media/image/icons/context.png"
+                  class="context"
+                  id="context-showNameColors"
+                />
+                <label class="switch">
+                  <input type="checkbox" id="showNameColors" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="option">
+                Show display names
+                <img
+                  src="/media/image/icons/context.png"
+                  class="context"
+                  id="context-showDisplayNames"
+                />
+                <label class="switch">
+                  <input type="checkbox" id="showDisplayNames" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="buttons">
+          <div class="left">
+            <button>Import</button>
+            <button>Export</button>
+          </div>
+          <div class="right">
+            <button onclick="saveSettings('general')">Save</button>
+            <button onclick="resetSettings('general')">Reset</button>
+          </div>
+        </div>
+      </div>
+      <div class="chat-card">
+        <div class="head">
+          <h3 class="name">Advanced</h3>
+        </div>
+        <div class="body">
+          <div class="option">
+            Developer mode
+            <img
+              src="/media/image/icons/context.png"
+              class="context"
+              id="context-devMode"
+            />
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="devMode"
+                onchange="toggleSettings('debug')"
+                checked="unchecked"
+              />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="option disabled" type="debug">
+            Reconnection popups
+            <img
+              src="/media/image/icons/context.png"
+              class="context"
+              id="context-reconnectPopups"
+            />
+            <label class="switch">
+              <input type="checkbox" id="reconnectPopups" group="debug" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="option disabled" type="debug">
+            Copy IDs
+            <img
+              src="/media/image/icons/context.png"
+              class="context"
+              id="context-displayIds"
+            />
+            <label class="switch">
+              <input type="checkbox" id="displayIds" group="debug" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+        <div class="buttons">
+          <div class="left">
+            <button>Import</button>
+            <button>Export</button>
+          </div>
+          <div class="right">
+            <button onclick="saveSettings('advanced')">Save</button>
+            <button onclick="resetSettings('advanced')">Reset</button>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
-  <script src="/js/script.js"></script>
   <script src="/js/all.js"></script>
+  <input type="file" id="image-input" accept="image/*" style="display: none" />
+  <script src="/js/settings.js"></script>
 </html>

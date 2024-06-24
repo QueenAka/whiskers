@@ -3,24 +3,15 @@ urlObj.search = "";
 urlObj.hash = "";
 const url = urlObj.toString();
 const inputData = {};
-let userData;
 let uname;
 let dname;
 let lastUser;
 let clientId;
+let emojiOpened = false;
+let loadingMessages = [];
 let msgTimeout = setTimeout(() => {
   lastUser = null;
 }, 60000);
-let commandsOpened = false;
-let emojiOpened = false;
-let loadingMessages = [];
-console.clear();
-console.log(url);
-let consoleBigRed = "color:red; font-size:40px;";
-console.log("%cSTOP!!", consoleBigRed);
-console.log(
-  "If you do not know what you are doing, you could be in danger of losing your account!\nDo not run code here unless you know EXACTLY what you are doing.\nLove from the Whiskers Team <3",
-);
 
 fetch("/api/settings", {
   method: "POST",
@@ -43,7 +34,7 @@ fetch("/api/settings", {
       if (userData != null) {
         lastUser = null;
         uname = accountName;
-        dname = userData.settings.displayName;
+        dname = userData.settings.account.displayName;
 
         fetch("/events/post", {
           method: "POST",
@@ -56,6 +47,7 @@ fetch("/api/settings", {
             data: {
               username: uname,
               displayName: dname,
+              joinMessages: s.general.joinMessages,
             },
           }),
         })
@@ -113,92 +105,142 @@ function highlight(id) {
 
 async function emojiList() {
   return new Promise(async (resolve) => {
-    if (commandsOpened) {
-      await commandList();
-    }
     if (emojiOpened == false) {
       emojiOpened = true;
       let chooser = document.createElement("div");
-      chooser.classList = "emoji-chooser";
-      let list = "";
+      chooser.classList = "chooser emoji-list";
+      const list = document.createElement("div");
+      list.id = "emojiContent";
       allEmojis.forEach((emoji) => {
-        list += `<img src='${emoji.url}'  class='list-item' onclick='emojiClick("${emoji.name}")'>`;
+        list.innerHTML += `<img src='${emoji.url}'  class='list-item' onclick='emojiClick("${emoji.name}")'>`;
       });
-      chooser.innerHTML = list;
+      const sideBar = document.createElement("div");
+      sideBar.classList = "sidebar";
+      sideBar.innerHTML = `
+      <img src="/media/image/icons/emoji.png" onclick="loadEmojisBar()" id="emojisIcon" class="on">
+      <img src="/media/image/icons/gif.png" onclick="loadGifsBar()" id="gifsIcon">
+      <img src="/media/image/icons/image.png" onclick="loadImagesBar()" id="imagesIcon">
+      `;
+      chooser.appendChild(list);
+      chooser.appendChild(sideBar);
       chooser.id = "emojiChooser";
-      let nav = document.getElementById("bottom-nav");
       document.body.appendChild(chooser);
-      setTimeout(() => {
-        nav.classList.add("nav-emoji-picker");
-        resolve();
-      }, 50);
+      resolve();
     } else {
       emojiOpened = false;
       let chooser = document.getElementById("emojiChooser");
-      let nav = document.getElementById("bottom-nav");
-      chooser.style.animation = "swipedown 0.4s ease-out";
+      chooser.style.animation = "swipedown 0.4s ease-in-out";
       setTimeout(() => {
-        nav.classList.remove("nav-emoji-picker");
-        setTimeout(() => {
-          chooser.remove();
-          resolve();
-        }, 75);
-      }, 125);
+        chooser.remove();
+        resolve();
+      }, 300);
     }
   });
 }
 
-async function commandList() {
-  return new Promise(async (resolve) => {
-    if (emojiOpened) {
-      await emojiList();
+function loadEmojisBar() {
+  if (!emojiOpened) return;
+  const emojisIcon = document.getElementById("emojisIcon");
+  const gifsIcon = document.getElementById("gifsIcon");
+  const imagesIcon = document.getElementById("imagesIcon");
+  emojisIcon.classList.add("on");
+  gifsIcon.classList.remove("on");
+  imagesIcon.classList.remove("on");
+  const content = document.getElementById("emojiContent");
+  content.innerHTML = "";
+  allEmojis.forEach((emoji) => {
+    content.innerHTML += `<img src='${emoji.url}'  class='list-item' onclick='emojiClick("${emoji.name}")'>`;
+  });
+}
+
+function loadGifsBar() {
+  if (!emojiOpened) return;
+  const emojisIcon = document.getElementById("emojisIcon");
+  const gifsIcon = document.getElementById("gifsIcon");
+  const imagesIcon = document.getElementById("imagesIcon");
+  gifsIcon.classList.add("on");
+  emojisIcon.classList.remove("on");
+  imagesIcon.classList.remove("on");
+  const content = document.getElementById("emojiContent");
+  content.innerHTML =
+    "<input id='gifSearch'><div id='searchContent' class='img-holder'><p class='lt' style='text-align: center;'>Search for a GIF</p></div>";
+  const search = document.getElementById("gifSearch");
+  search.addEventListener("keydown", (e) => {
+    if (e.key == "Enter") {
+      tenorSearch(search.value, 0);
     }
-    if (commandsOpened == false) {
-      fetch("/api/commands")
-        .then((res) => res.json())
-        .then((data) => {
-          commandsOpened = true;
-          let chooser = document.createElement("div");
-          chooser.classList = "emoji-chooser";
-          chooser.id = "commandChooser";
-          let list = "";
-          const cats = Object.keys(data);
-          cats.forEach((cat) => {
-            list += `<h3>${cat}</h3>`;
-            data[cat].forEach((cmd) => {
-              list += `<div class='list-item-card' onclick='commandClick("${cmd.usage}")'><b>${cmd.id}</b><p>${cmd.description}</p></div>`;
-            });
-          });
-          chooser.innerHTML = list;
-          let nav = document.getElementById("bottom-nav");
-          document.body.appendChild(chooser);
-          setTimeout(() => {
-            nav.classList.add("nav-emoji-picker");
-            resolve();
-          }, 50);
-        });
-    } else {
-      commandsOpened = false;
-      let chooser = document.getElementById("commandChooser");
-      let nav = document.getElementById("bottom-nav");
-      chooser.style.animation = "swipedown 0.4s ease-out";
-      setTimeout(() => {
-        nav.classList.remove("nav-emoji-picker");
-        setTimeout(() => {
-          chooser.remove();
-          resolve();
-        }, 75);
-      }, 125);
+  });
+}
+
+function imgurSearch(q, next) {
+  const search = document.getElementById("imageSearch");
+  const searchContent = document.getElementById("searchContent");
+  if (q.trim() == "") return;
+  search.setAttribute("disabled", "");
+  searchContent.innerHTML =
+    "<p class='lt' style='text-align: center;'>Searching...</p>";
+  fetch(`/api/imgur?q=${q}&next=${next}`)
+    .then((res) => res.json())
+    .then((data) => {
+      searchContent.innerHTML = "";
+      if (data.images.length == 0)
+        searchContent.innerHTML =
+          "<p class='lt' style='text-align: center;'>Nothing found</p>";
+
+      data.images.forEach((image) => {
+        searchContent.innerHTML += `<img src="${image.link}" onclick="sendTxt('${image.link}')">`;
+      });
+      if (data.images.length != 0)
+        searchContent.innerHTML += `<button onclick="imgurSearch('${q}', ${data.next})">Next Page</button>`;
+      search.removeAttribute("disabled");
+    });
+}
+
+function tenorSearch(q, next) {
+  const search = document.getElementById("gifSearch");
+  const searchContent = document.getElementById("searchContent");
+  if (q.trim() == "") return;
+  search.setAttribute("disabled", "");
+  searchContent.innerHTML =
+    "<p class='lt' style='text-align: center;'>Searching...</p>";
+  fetch(`/api/tenor?q=${q}&next=${next}`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      searchContent.innerHTML = "";
+      if (data.results.length == 0)
+        searchContent.innerHTML =
+          "<p class='lt' style='text-align: center;'>Nothing found</p>";
+      data.results.forEach((gif) => {
+        searchContent.innerHTML += `<img src="${gif.media_formats.gif.url}" onclick="sendTxt('${gif.media_formats.gif.url}')">`;
+      });
+      if (data.results.length != 0)
+        searchContent.innerHTML += `<button onclick="tenorSearch('${q}', ${data.next})">Next Page</button>`;
+      search.removeAttribute("disabled");
+    });
+}
+
+function loadImagesBar() {
+  if (!emojiOpened) return;
+  const emojisIcon = document.getElementById("emojisIcon");
+  const gifsIcon = document.getElementById("gifsIcon");
+  const imagesIcon = document.getElementById("imagesIcon");
+  imagesIcon.classList.add("on");
+  emojisIcon.classList.remove("on");
+  gifsIcon.classList.remove("on");
+  const content = document.getElementById("emojiContent");
+  content.innerHTML =
+    "<input id='imageSearch'><div id='searchContent' class='img-holder'><p class='lt' style='text-align: center;'>Search for an image</p></div>";
+  const search = document.getElementById("imageSearch");
+  search.addEventListener("keydown", (e) => {
+    if (e.key == "Enter") {
+      imgurSearch(search.value, 1);
     }
   });
 }
 
 function emojiClick(name) {
   document.getElementById("msginp").value += ":" + name + ":";
-}
-
-function commandClick(usage) {
-  document.getElementById("msginp").value += "/" + usage;
 }
 
 function removeReply(msg) {
@@ -218,10 +260,12 @@ function send() {
     json = {
       type: "messageCreate",
       data: JSON.stringify({
-        content: `{${inputData.id}}${msg}`,
+        content: `{${inputData.id}} ${msg}`,
         author: {
           username: uname,
           displayName: dname,
+          nameColor: s.account.nameColor,
+          pfp: s.account.pfp,
         },
         tempId: new Date().getTime(),
       }),
@@ -246,13 +290,34 @@ function send() {
         author: {
           username: uname,
           displayName: dname,
+          nameColor: s.account.nameColor,
+          pfp: s.account.pfp,
         },
         tempId: new Date().getTime(),
       }),
       url: url,
     };
   }
-  if (!inputData.type == "edit") buildMessage(json, "temp");
+  if (inputData.type != "edit") buildMessage(json, "temp");
+  sendToClients(json);
+}
+
+function sendTxt(txt) {
+  const json = {
+    type: "messageCreate",
+    data: JSON.stringify({
+      content: txt,
+      author: {
+        username: uname,
+        displayName: dname,
+        nameColor: s.account.nameColor,
+        pfp: s.account.pfp,
+      },
+      tempId: new Date().getTime(),
+    }),
+    url: url,
+  };
+  buildMessage(json, "temp");
   sendToClients(json);
 }
 
@@ -323,6 +388,7 @@ function messageReceiver(event) {
 
 async function errorHandler() {
   const online = await startEventFlow();
+  if (s.advanced.reconnectPopups) popup("Trying to reconnect...");
   if (!online) {
     const offlineDiv = document.createElement("div");
     offlineDiv.id = "offlinePage";
@@ -330,10 +396,10 @@ async function errorHandler() {
     offlineDiv.innerHTML =
       "<center><div class='offline-logo'></div><h3>You are offline! Please connect to the internet and reload to continue!</h3><button onclick='window.location.reload()'>Reload Page</button></center>";
     document.body.appendChild(offlineDiv);
-  }
+  } else if (s.advanced.reconnectPopups) popup("Reconnected!");
 }
 
-function buildMessage(message, type) {
+async function buildMessage(message, type) {
   if (type == "message") {
     let msgId = message.id;
     messageData = JSON.parse(message.data);
@@ -344,30 +410,49 @@ function buildMessage(message, type) {
     let username = messageData.author.username;
     if (username == "[SERVER]") username = message.id;
     let displayName = messageData.author.displayName;
+    if (!s.general.showDisplayNames && username != message.id)
+      displayName = `@${username}`;
+    let nameColor = messageData.author.nameColor;
+    if (!s.general.showNameColors) nameColor = "#ffffff";
+    const pfp = messageData.author.pfp;
+    const dontShowPfp = username == message.id || !s.general.showPfps;
     let appendUser = username != lastUser;
     lastUser = username;
+    let messageObject = {};
+    messageObject.message = clean(messageData.content);
+    messageObject.embeds = [];
+
+    if (s.general.messageEmbeds)
+      messageObject = await format(messageData.content, true);
 
     if (displayName == null) {
-      displayName = clean(messageData.content);
-      messageData.content = "";
+      displayName = messageData.content;
+      messageObject.message = "";
     }
 
     const messages = document.getElementById("log");
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("msgr");
+    if (!dontShowPfp) msgDiv.classList.add("msgr-pfp");
     msgDiv.id = `msg-${msgId}`;
 
     const topDiv = document.createElement("div");
     topDiv.classList.add("top");
 
+    const pfpDiv = document.createElement("img");
+    pfpDiv.classList.add("pfp");
+    pfpDiv.src = pfp || "/media/image/icons/profile.png";
+
     const authorSpan = document.createElement("b");
     authorSpan.id = msgId;
-    authorSpan.innerHTML = displayName;
+    authorSpan.innerHTML = clean(displayName);
+    authorSpan.style.color = nameColor || "white";
 
     const dateSpan = document.createElement("span");
     dateSpan.classList.add("lt");
     dateSpan.innerHTML = ` ${formateDate(new Date())}`;
 
+    if (!dontShowPfp) topDiv.appendChild(pfpDiv);
     topDiv.appendChild(authorSpan);
     topDiv.appendChild(dateSpan);
     topDiv.innerHTML += "<br>";
@@ -377,13 +462,65 @@ function buildMessage(message, type) {
     const bottomSpan = document.createElement("span");
     bottomSpan.classList.add("messageContent");
     bottomSpan.id = `content-${msgId}`;
-    bottomSpan.innerHTML = clean(messageData.content);
+    let embeds = messageObject.embeds.length > 0;
+    let embedDivs = document.createElement("div");
+    bottomSpan.innerHTML = messageObject.message;
+    if (embeds) {
+      messageObject.embeds.forEach(async (embed) => {
+        if (embed.media) {
+          if (embed.media == "image") {
+            let img = document.createElement("img");
+            img.src = embed.url;
+            img.classList.add("user-img");
+            embedDivs.appendChild(img);
+          } else if (embed.media == "video" || embed.media == "audio") {
+            let doc = document.createElement(embed.media);
+            doc.controls = true;
+            doc.innerHTML = `<source src="${embed.url}">`;
+            doc.classList.add(`user-${embed.media}`);
+            embedDivs.appendChild(doc);
+          }
+        } else {
+          const embedDiv = document.createElement("div");
+          embedDiv.classList.add("embed");
+          embedDiv.onclick = () => {
+            window.open(embed.url, "_blank");
+          };
+
+          const title = document.createElement("h3");
+          title.innerHTML = clean(embed.title);
+          embedDiv.appendChild(title);
+
+          const description = document.createElement("p");
+          description.innerHTML = clean(embed.description);
+          embedDiv.appendChild(description);
+
+          if (embed.image) {
+            const image = document.createElement("img");
+            image.src = embed.image;
+            embedDiv.appendChild(image);
+          }
+
+          embedDivs.appendChild(embedDiv);
+        }
+      });
+    }
 
     const bottomDiv = document.createElement("div");
     bottomDiv.appendChild(bottomSpan);
     msgDiv.appendChild(bottomDiv);
+    msgDiv.appendChild(embedDivs);
+    if (appendUser) {
+      const spacer = document.createElement("div");
+      spacer.classList.add("spacer");
+      messages.appendChild(spacer);
+    }
     messages.appendChild(msgDiv);
+
     let longPress = false;
+
+    const content = messageData.content;
+
     async function rcmenu(e) {
       const prevMenu = document.getElementById("rclickMenu");
       if (prevMenu) prevMenu.remove();
@@ -395,7 +532,7 @@ function buildMessage(message, type) {
       copyMsg.classList.add("item");
       copyMsg.innerHTML = "Copy Text <img src='/media/image/icons/copy.png' />";
       copyMsg.onclick = () => {
-        copyText(messageData.content);
+        copyText(content);
         if (document.querySelector("html.mobile")) {
           menu.style.bottom = "-100%";
         } else {
@@ -428,7 +565,7 @@ function buildMessage(message, type) {
         editMsg.classList.add("item");
         editMsg.innerHTML = "Edit <img src='/media/image/icons/edit.png' />";
         editMsg.onclick = () => {
-          editMessage(msgId, messageData.content);
+          editMessage(msgId, "");
           if (document.querySelector("html.mobile")) {
             menu.style.bottom = "-100%";
           } else {
@@ -458,21 +595,23 @@ function buildMessage(message, type) {
         menu.appendChild(deleteMsg);
       }
 
-      const copyId = document.createElement("div");
-      copyId.classList.add("item");
-      copyId.innerHTML = "Copy ID <img src='/media/image/icons/id.png' />";
-      copyId.onclick = () => {
-        copyText(msgId);
-        if (document.querySelector("html.mobile")) {
-          menu.style.bottom = "-100%";
-        } else {
-          menu.style.opacity = 0;
-        }
-        setTimeout(() => {
-          menu.remove();
-        }, 100);
-      };
-      menu.appendChild(copyId);
+      if (s.advanced.displayIds) {
+        const copyId = document.createElement("div");
+        copyId.classList.add("item");
+        copyId.innerHTML = "Copy ID <img src='/media/image/icons/id.png' />";
+        copyId.onclick = () => {
+          copyText(msgId);
+          if (document.querySelector("html.mobile")) {
+            menu.style.bottom = "-100%";
+          } else {
+            menu.style.opacity = 0;
+          }
+          setTimeout(() => {
+            menu.remove();
+          }, 100);
+        };
+        menu.appendChild(copyId);
+      }
 
       if (!document.querySelector("html.mobile")) {
         menu.style.left = e.clientX + "px";
@@ -494,6 +633,7 @@ function buildMessage(message, type) {
         document.removeEventListener(e.type, arguments.callee);
       });
     }
+
     msgDiv.addEventListener("contextmenu", (e) => {
       longPress = false;
       e.preventDefault();
@@ -501,7 +641,6 @@ function buildMessage(message, type) {
     });
 
     msgDiv.addEventListener("mousedown", (e) => {
-      e.preventDefault();
       const pressTimer = setTimeout(() => {
         longPress = true;
         rcmenu(e);
@@ -516,7 +655,6 @@ function buildMessage(message, type) {
     });
 
     msgDiv.addEventListener("touchstart", (e) => {
-      e.preventDefault();
       const pressTimer = setTimeout(() => {
         longPress = true;
         rcmenu(e);
@@ -532,52 +670,12 @@ function buildMessage(message, type) {
 
     resetTimer();
 
-    aud = "/media/audio/meow.mp3";
+    aud = s.account.messageSound;
     if (username != uname) {
       var audio = new Audio(aud);
       audio.loop = false;
       audio.play();
     }
-
-    messages.scrollTop = messages.scrollHeight;
-  } else if (type == "temp") {
-    let messageData = JSON.parse(message.data);
-    let msgId = messageData.tempId;
-    loadingMessages.push(msgId);
-    let username = messageData.author.username;
-    let displayName = messageData.author.displayName;
-    let appendUser = username != lastUser;
-    const messages = document.getElementById("log");
-    const msgDiv = document.createElement("div");
-    msgDiv.classList.add("msgr");
-    msgDiv.classList.add("temp");
-    msgDiv.id = `temp-${msgId}`;
-
-    const topDiv = document.createElement("div");
-    topDiv.classList.add("top");
-
-    const authorSpan = document.createElement("b");
-    authorSpan.id = msgId;
-    authorSpan.innerHTML = displayName;
-
-    const dateSpan = document.createElement("span");
-    dateSpan.classList.add("lt");
-    dateSpan.innerHTML = ` ${formateDate(new Date())}`;
-
-    topDiv.appendChild(authorSpan);
-    topDiv.appendChild(dateSpan);
-    topDiv.innerHTML += "<br>";
-
-    if (appendUser) msgDiv.appendChild(topDiv);
-
-    const bottomSpan = document.createElement("span");
-    bottomSpan.classList.add("messageContent");
-    bottomSpan.innerHTML = clean(messageData.content);
-
-    const bottomDiv = document.createElement("div");
-    bottomDiv.appendChild(bottomSpan);
-    msgDiv.appendChild(bottomDiv);
-    messages.appendChild(msgDiv);
 
     messages.scrollTop = messages.scrollHeight;
   }
@@ -604,7 +702,7 @@ function replyMessage(id, auth) {
   inputType.id = "inputType";
   inputType.classList.add("input-type");
   if (!prevType) inputType.style.opacity = 0;
-  inputType.innerHTML = `Replying to <span onclick="highlight(${id})">${auth}</span> <img src='/media/image/icons/cancel.png' onclick='removeInputType()' />`;
+  inputType.innerHTML = ` <img src='/media/image/icons/cancel.png' onclick='removeInputType()' /> Replying to <span onclick="highlight(${id})">${auth}</span>`;
   document.body.appendChild(inputType);
   setTimeout(() => {
     inputType.style.opacity = 1;
@@ -638,7 +736,7 @@ function editMessage(id, content) {
   inputType.id = "inputType";
   inputType.classList.add("input-type");
   if (!prevType) inputType.style.opacity = 0;
-  inputType.innerHTML = `Editing <span onclick="highlight(${id})">Message</span> <img src='/media/image/icons/cancel.png' onclick='removeInputType()' />`;
+  inputType.innerHTML = `<img src='/media/image/icons/cancel.png' onclick='removeInputType()' /> Editing <span onclick="highlight(${id})">Message</span> `;
   document.body.appendChild(inputType);
   setTimeout(() => {
     inputType.style.opacity = 1;
@@ -656,4 +754,26 @@ function removeInputType() {
   inputData.type = "message";
   inputData.id = null;
   document.getElementById("msginp").value = "";
+}
+
+function uploadMedia() {
+  const input = document.getElementById("uploadMedia");
+  input.click();
+  input.onchange = () => {
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          popup(data.error);
+        } else {
+          sendTxt(`https://${urlObj.host}/media/uploads/${data.url}`);
+        }
+      });
+  };
 }

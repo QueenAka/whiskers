@@ -2,7 +2,28 @@
   "test": {
     "password": "test",
     "settings": {
-      "displayName": "Test"
+      "account": {
+        "pfp": "/media/image/icons/profile.png",
+        "displayName": "Mr. Test",
+        "bio": "",
+        "nameColor": "#FFFFFF",
+        "messageSound": "/media/audio/meow.mp3"
+      },
+      "general": {
+        "appTheme": "poppy-seed",
+        "joinMessages": true,
+        "chatSounds": true,
+        "pushNotif": false,
+        "messageEmbeds": true,
+        "showPfps": true,
+        "showNameColors": true,
+        "showDisplayNames": true
+      },
+      "advanced": {
+        "devMode": false,
+        "reconnectPopups": false,
+        "displayIds": false
+      }
     },
     "ownedChats": [],
     "bannedChats": []
