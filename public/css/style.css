@@ -304,8 +304,8 @@ nav a {
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   color: var(--text);
 }
 
@@ -314,9 +314,9 @@ nav a {
 }
 
 #log {
-  height: calc(100vh - 102px);
+  height: calc(100vh - 122px);
   width: 100vw;
-  margin-top: 30px;
+  margin-top: 50px;
   overflow-y: auto;
   overflow-x: hidden;
   padding-bottom: 20px;
@@ -324,13 +324,13 @@ nav a {
 
 .desktopApp #log {
   margin-top: 80px;
-  height: calc(100vh - 132px);
+  height: calc(100vh - 152px);
+  padding-bottom: 20px;
 }
 
 .msgr {
   padding: 0px 5px;
-  margin-bottom: 0;
-  width: 100%;
+  width: calc(100% - 10px);
   display: block;
   cursor: normal;
   position: relative;
@@ -341,7 +341,6 @@ nav a {
 .msgr.msgr-pfp {
   padding: 0px 5px;
   padding-left: 55px; 
-  margin-bottom: 0;
   width: calc(100% - 60px);
   display: block;
   cursor: normal;
@@ -350,9 +349,8 @@ nav a {
   color: var(--text);
 }
 
-.spacer {
-  width: 100%;
-  height: 20px;
+.msgr.spacer {
+  margin-top: 20px;
 }
 
 .top .pfp {
@@ -473,7 +471,7 @@ a {
   width: 100%;
   border-radius: 0px;
   overflow: auto;
-  animation: swipeup 0.4s ease-out;
+  animation: mobileswipeup2 0.4s ease-out;
   scrollbar-width: none;
   z-index: 500;
   box-shadow: 0 0 0 2px var(--highlights);
@@ -516,10 +514,32 @@ a {
 @keyframes swipedown {
   from {
     bottom: 60px;
-    z-index: 0;
   } to {
     bottom: -100%;
-    z-index: 0;
+  }
+}
+
+@keyframes mobileswipeup {
+  from {
+    bottom: -100%;
+  } to {
+    bottom: 0;
+  }
+}
+
+@keyframes mobileswipedown {
+  from {
+    bottom: 50px;
+  } to {
+    bottom: -100%;
+  }
+}
+
+@keyframes mobileswipeup2 {
+  from {
+    bottom: -100%;
+  } to {
+    bottom: 50px;
   }
 }
 
@@ -762,7 +782,7 @@ code {
   z-index: 2000;
   margin: 0;
   border-radius: 0px;
-  animation: swipeup 0.2s ease-out;
+  animation: mobileswipeup 0.2s ease-out;
   background: var(--background);
   transition: all 0.2s ease-in;
 }
@@ -1018,4 +1038,12 @@ load {
 
 load img {
   width: 150px;
+}
+
+.sp-l {
+  margin-left: 5px;
+}
+
+.sp-r {
+  margin-right: 5px;
 }

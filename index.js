@@ -137,7 +137,6 @@ app.get("/events/get", (req, res) => {
           author: {
             username: "[SERVER]",
             displayName: null,
-            pfp: "/media/image/icons/profile.png",
           },
         }),
         id: Date.now().toString(),
@@ -159,8 +158,10 @@ app.get("/events/get", (req, res) => {
         url: clientUrl,
         data: JSON.stringify({
           content: `**${clientAuthor}** has left the chat.`,
-          author: "[SERVER]",
-          display: null,
+          author: {
+            username: "[SERVER]",
+            displayName: null,
+          },
         }),
         id: Date.now().toString(),
       })}\n\n`,

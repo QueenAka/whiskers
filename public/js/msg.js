@@ -5,6 +5,7 @@ const url = urlObj.toString();
 const inputData = {};
 let uname;
 let dname;
+let lastMsgPfp = false;
 let lastUser;
 let clientId;
 let emojiOpened = false;
@@ -129,7 +130,11 @@ async function emojiList() {
     } else {
       emojiOpened = false;
       let chooser = document.getElementById("emojiChooser");
-      chooser.style.animation = "swipedown 0.4s ease-in-out";
+      if (document.querySelector("html.mobile")) {
+        chooser.style.animation = "mobileswipedown 0.4s ease-in-out";
+      } else {
+        chooser.style.animation = "swipedown 0.4s ease-in-out";
+      }
       setTimeout(() => {
         chooser.remove();
         resolve();
@@ -382,7 +387,10 @@ function messageReceiver(event) {
     const data = JSON.parse(message.data);
     const id = data.id;
     const content = document.getElementById(`content-${id}`);
-    content.innerHTML = clean(data.content) + " <h6 class='lt'>(edited)</h6>";
+    const unparsed = document.getElementById(`unparsed-${id}`);
+    content.innerHTML =
+      clean(data.content) + "<h6 class='lt sp-l'>(edited)</h6>";
+    unparsed.value = data.content;
   }
 }
 
@@ -394,7 +402,7 @@ async function errorHandler() {
     offlineDiv.id = "offlinePage";
     offlineDiv.classList.add("offline");
     offlineDiv.innerHTML =
-      "<center><div class='offline-logo'></div><h3>You are offline! Please connect to the internet and reload to continue!</h3><button onclick='window.location.reload()'>Reload Page</button></center>";
+      "<center><div class='offline-logo'></div><h3>You're offline! Please connect to the internet to continue!</h3><button onclick='window.location.reload()'>Reload Page</button></center>";
     document.body.appendChild(offlineDiv);
   } else if (s.advanced.reconnectPopups) popup("Reconnected!");
 }
@@ -415,7 +423,7 @@ async function buildMessage(message, type) {
     let nameColor = messageData.author.nameColor;
     if (!s.general.showNameColors) nameColor = "#ffffff";
     const pfp = messageData.author.pfp;
-    const dontShowPfp = username == message.id || !s.general.showPfps;
+    const dontShowPfp = username == msgId || !s.general.showPfps;
     let appendUser = username != lastUser;
     lastUser = username;
     let messageObject = {};
@@ -425,7 +433,7 @@ async function buildMessage(message, type) {
     if (s.general.messageEmbeds)
       messageObject = await format(messageData.content, true);
 
-    if (displayName == null) {
+    if (username == msgId) {
       displayName = messageData.content;
       messageObject.message = "";
     }
@@ -452,6 +460,12 @@ async function buildMessage(message, type) {
     dateSpan.classList.add("lt");
     dateSpan.innerHTML = ` ${formateDate(new Date())}`;
 
+    const unparsed = document.createElement("input");
+    unparsed.style.display = "none";
+    unparsed.id = `unparsed-${msgId}`;
+    unparsed.value = messageData.content;
+    msgDiv.appendChild(unparsed);
+
     if (!dontShowPfp) topDiv.appendChild(pfpDiv);
     topDiv.appendChild(authorSpan);
     topDiv.appendChild(dateSpan);
@@ -462,6 +476,7 @@ async function buildMessage(message, type) {
     const bottomSpan = document.createElement("span");
     bottomSpan.classList.add("messageContent");
     bottomSpan.id = `content-${msgId}`;
+
     let embeds = messageObject.embeds.length > 0;
     let embedDivs = document.createElement("div");
     bottomSpan.innerHTML = messageObject.message;
@@ -510,17 +525,13 @@ async function buildMessage(message, type) {
     bottomDiv.appendChild(bottomSpan);
     msgDiv.appendChild(bottomDiv);
     msgDiv.appendChild(embedDivs);
-    if (appendUser) {
-      const spacer = document.createElement("div");
-      spacer.classList.add("spacer");
-      messages.appendChild(spacer);
-    }
+    if (appendUser && !dontShowPfp && lastMsgPfp) {
+      msgDiv.classList.add("spacer");
+      lastMsgPfp = true;
+    } else lastMsgPfp = false;
     messages.appendChild(msgDiv);
 
     let longPress = false;
-
-    const content = messageData.content;
-
     async function rcmenu(e) {
       const prevMenu = document.getElementById("rclickMenu");
       if (prevMenu) prevMenu.remove();
@@ -532,7 +543,8 @@ async function buildMessage(message, type) {
       copyMsg.classList.add("item");
       copyMsg.innerHTML = "Copy Text <img src='/media/image/icons/copy.png' />";
       copyMsg.onclick = () => {
-        copyText(content);
+        const text = document.getElementById(`unparsed-${msgId}`).value;
+        copyText(text);
         if (document.querySelector("html.mobile")) {
           menu.style.bottom = "-100%";
         } else {
@@ -724,11 +736,11 @@ function deleteMessage(id) {
   });
 }
 
-function editMessage(id, content) {
+function editMessage(id) {
   const msgInput = document.getElementById("msginp");
   const prevType = document.getElementById("inputType");
   if (prevType) prevType.remove();
-  msgInput.value = content;
+  msgInput.value = document.getElementById(`unparsed-${id}`).value;
   msgInput.focus();
   inputData.type = "edit";
   inputData.id = id;
