@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
+    <load>
+      <img src="/media/image/icons/logo.png" />
+    </load>
     <nav>
       <img
         width="30px"
@@ -34,18 +37,27 @@
     <div id="log"></div>
     <div class="bottom-nav" id="bottom-nav">
       <input placeholder="Send a message..." id="msginp" type="text" />
-      <img
-        onclick="emojiList()"
-        class="icon"
-        src="/media/image/icons/emoji.png"
+      <div class="icons">
+        <img
+          onclick="emojiList()"
+          class="icon"
+          src="/media/image/icons/emoji.png"
+        />
+        <img
+          onclick="uploadMedia()"
+          class="icon"
+          src="/media/image/icons/add.png"
+        />
+        <img onclick="send()" src="/media/image/icons/send.png" class="icon" />
+      </div>
+      <input
+        style="display: none"
+        type="file"
+        accept="audio/* image/* video/*"
+        id="uploadMedia"
       />
-      <img
-        onclick="commandList()"
-        class="icon"
-        src="/media/image/icons/command.png"
-      />
-      <img onclick="send()" src="/media/image/icons/send.png" class="icon" />
     </div>
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="/js/all.js"></script>
     <script src="/js/msg.js"></script>
   </body>
