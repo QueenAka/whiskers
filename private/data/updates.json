@@ -1,22 +1,17 @@
 [
   {
-    "name": "Update 0.5",
+    "name": "Update 0.0.5",
     "description": "Added the ability to use code blocks in chats by using back-ticks (`). As well as this, the fresh new ... news log ... is here, and displays the **latest** and **greatest** updates Whiskers has to offer :shades:",
     "timestamp": "22:46 EST, 6/7/2024"
   },
   {
-    "name": "Update 0.6",
+    "name": "Update 0.0.6",
     "description": "A new offline page and server reconnector has been added, now you will no longer need to reload the page every 10 minutes because the server timed out! :euphoric:",
     "timestamp": "22:01 EST, 6/8/2024"
   },
   {
-    "name": "Update 0.7",
+    "name": "Update 0.0.7",
     "description": "New reply system, as well as the ability to edit and delete messages!! :happy: As well as this, we did some minor bug fixes, and started work on a couple brand new ... *things*",
-    "timestamp": "20:37 EST, 6/12/2024"
-  },
-  {
-    "name": "Update 0.8",
-    "description": "***BIGGEST UPDATE YET!!! :euphoric:*** Imgur and Tenor intergrations, profile pictures, settings overhaul, media uploads, sorted emojis trey, and, like always, minor bug fixes!",
-    "timestamp": "19:59 EST, 6/23/2024"
+    "timestamp": "22:01 EST, 6/8/2024"
   }
 ]

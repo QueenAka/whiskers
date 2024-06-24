@@ -1,0 +1,53 @@
+{
+  "moderation": [
+    {
+      "id": "kick",
+      "description": "Kick a user from this chat room",
+      "usage": "kick <user> [reason]",
+      "function": "kick({user}, {reason || 'No reason provided'})",
+      "permissions": "kickUsers"
+    },
+    {
+      "id": "ban",
+      "description": "Ban a user from this chat room",
+      "usage": "ban <user> [reason]",
+      "function": "ban({user}, {reason || 'No reason provided'})",
+      "permissions": "banUsers"
+    },
+    {
+      "id": "unban",
+      "description": "Unban a user from this chat room",
+      "usage": "unban <user>",
+      "function": "unban({user})",
+      "permissions": "banUsers"
+    },
+    {
+      "id": "banlist",
+      "description": "List all banned users from this chat room",
+      "usage": "banlist",
+      "function": "banlist()",
+      "permissions": "moderator"
+    },
+    {
+      "id": "mute",
+      "description": "Mute a user in this chat room",
+      "usage": "mute <user> [reason]",
+      "function": "mute({user}, {reason || 'No reason provided'})",
+      "permissions": "muteUsers"
+    },
+    {
+      "id": "unmute",
+      "description": "Unmute a user in this chat room",
+      "usage": "unmute <user>",
+      "function": "unmute({user})",
+      "permissions": "muteUsers"
+    },
+    {
+      "id": "mutelist",
+      "description": "List all muted users in this chat room",
+      "usage": "mutelist",
+      "function": "mutelist()",
+      "permissions": "moderator"
+    }
+  ]
+}

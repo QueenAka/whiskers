@@ -109,7 +109,7 @@
         fetch("/api/updates")
           .then((res) => res.json())
           .then((data) => {
-            data.forEach(async (update) => {
+            data.forEach((update) => {
               const updateDiv = document.createElement("div");
               updateDiv.classList.add("chat-card");
 
@@ -140,7 +140,7 @@
         fetch("/api/chats")
           .then((res) => res.json())
           .then((data) => {
-            data.forEach(async (chat) => {
+            data.forEach((chat) => {
               const chatDiv = document.createElement("div");
               chatDiv.classList.add("chat-card");
 
