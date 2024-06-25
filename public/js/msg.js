@@ -411,10 +411,6 @@ async function buildMessage(message, type) {
   if (type == "message") {
     let msgId = message.id;
     messageData = JSON.parse(message.data);
-    if (loadingMessages.includes(messageData.tempId)) {
-      document.getElementById(`temp-${messageData.tempId}`).remove();
-      loadingMessages.splice(loadingMessages.indexOf(messageData.tempId), 1);
-    }
     let username = messageData.author.username;
     if (username == "[SERVER]") username = message.id;
     let displayName = messageData.author.displayName;
@@ -529,9 +525,6 @@ async function buildMessage(message, type) {
       msgDiv.classList.add("spacer");
       lastMsgPfp = true;
     } else lastMsgPfp = false;
-    messages.appendChild(msgDiv);
-
-    let longPress = false;
     async function rcmenu(e) {
       const prevMenu = document.getElementById("rclickMenu");
       if (prevMenu) prevMenu.remove();
@@ -630,9 +623,6 @@ async function buildMessage(message, type) {
         menu.style.top = e.clientY + "px";
       }
       document.body.appendChild(menu);
-      while (
-        await new Promise((resolve) => setTimeout(() => resolve(longPress)))
-      ) {}
       document.addEventListener("click", (e) => {
         if (document.querySelector("html.mobile")) {
           menu.style.bottom = "-100%";
@@ -647,41 +637,22 @@ async function buildMessage(message, type) {
     }
 
     msgDiv.addEventListener("contextmenu", (e) => {
-      longPress = false;
       e.preventDefault();
       rcmenu(e);
     });
 
-    msgDiv.addEventListener("mousedown", (e) => {
-      const pressTimer = setTimeout(() => {
-        longPress = true;
-        rcmenu(e);
-      }, 500);
-      document.addEventListener("mouseup", (e) => {
-        clearTimeout(pressTimer);
-        document.removeEventListener(e.type, arguments.callee);
-        if (longPress) {
-          longPress = false;
-        }
-      });
+    msgDiv.addEventListener("dblclick", (e) => {
+      e.preventDefault();
+      rcmenu(e);
     });
 
-    msgDiv.addEventListener("touchstart", (e) => {
-      const pressTimer = setTimeout(() => {
-        longPress = true;
-        rcmenu(e);
-      }, 500);
-      document.addEventListener("touchend", (e) => {
-        clearTimeout(pressTimer);
-        document.removeEventListener(e.type, arguments.callee);
-        if (longPress) {
-          longPress = false;
-        }
-      });
-    });
+    messages.appendChild(msgDiv);
+    if (loadingMessages.includes(messageData.tempId)) {
+      document.getElementById(`temp-${messageData.tempId}`).remove();
+      loadingMessages.splice(loadingMessages.indexOf(messageData.tempId), 1);
+    }
 
     resetTimer();
-
     aud = s.account.messageSound;
     if (username != uname) {
       var audio = new Audio(aud);
@@ -689,6 +660,76 @@ async function buildMessage(message, type) {
       audio.play();
     }
 
+    messages.scrollTop = messages.scrollHeight;
+  } else if (type == "temp") {
+    messageData = JSON.parse(message.data);
+    let msgId = messageData.tempId;
+    loadingMessages.push(msgId);
+    let username = messageData.author.username;
+    let displayName = messageData.author.displayName;
+    if (!s.general.showDisplayNames && username != message.id)
+      displayName = `@${username}`;
+    let nameColor = messageData.author.nameColor;
+    if (!s.general.showNameColors) nameColor = "#ffffff";
+    const pfp = messageData.author.pfp;
+    const dontShowPfp = username == msgId || !s.general.showPfps;
+    let appendUser = username != lastUser;
+    let messageObject = {};
+    messageObject.message = clean(messageData.content);
+    messageObject.embeds = [];
+
+    if (username == msgId) {
+      displayName = messageData.content;
+      messageObject.message = "";
+    }
+
+    const messages = document.getElementById("log");
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("msgr");
+    msgDiv.classList.add("temp");
+    if (!dontShowPfp) msgDiv.classList.add("msgr-pfp");
+    msgDiv.id = `temp-${msgId}`;
+
+    const topDiv = document.createElement("div");
+    topDiv.classList.add("top");
+
+    const pfpDiv = document.createElement("img");
+    pfpDiv.classList.add("pfp");
+    pfpDiv.src = "/media/image/icons/profile.png";
+
+    const authorSpan = document.createElement("b");
+    authorSpan.id = msgId;
+    authorSpan.innerHTML = clean(displayName);
+    authorSpan.style.color = nameColor || "white";
+
+    const dateSpan = document.createElement("span");
+    dateSpan.classList.add("lt");
+    dateSpan.innerHTML = ` ${formateDate(new Date())}`;
+
+    const unparsed = document.createElement("input");
+    unparsed.style.display = "none";
+    unparsed.id = `unparsed-${msgId}`;
+    unparsed.value = messageData.content;
+    msgDiv.appendChild(unparsed);
+
+    if (!dontShowPfp) topDiv.appendChild(pfpDiv);
+    topDiv.appendChild(authorSpan);
+    topDiv.appendChild(dateSpan);
+    topDiv.innerHTML += "<br>";
+
+    if (appendUser) msgDiv.appendChild(topDiv);
+
+    const bottomSpan = document.createElement("span");
+    bottomSpan.classList.add("messageContent");
+    bottomSpan.id = `content-${msgId}`;
+
+    const bottomDiv = document.createElement("div");
+    bottomDiv.appendChild(bottomSpan);
+    msgDiv.appendChild(bottomDiv);
+    if (appendUser && !dontShowPfp && lastMsgPfp) {
+      msgDiv.classList.add("spacer");
+    }
+    messages.appendChild(msgDiv);
     messages.scrollTop = messages.scrollHeight;
   }
 }
@@ -719,11 +760,6 @@ function replyMessage(id, auth) {
   setTimeout(() => {
     inputType.style.opacity = 1;
   }, 100);
-}
-
-function copyText(txt) {
-  navigator.clipboard.writeText(txt);
-  popup("Copied text!");
 }
 
 function deleteMessage(id) {

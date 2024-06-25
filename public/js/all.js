@@ -5,6 +5,14 @@ console.log(
   "If you do not know what you are doing, you could be in danger of losing your account!\nDo not run code here unless you know EXACTLY what you are doing.\nLove from the Whiskers Team <3",
 );
 
+let params = new URLSearchParams(window.location.search);
+const popupParam = params.get("p");
+if (popupParam) {
+  params = params.delete("p");
+  const updatedUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+  window.history.pushState({}, "", updatedUrl);
+}
+
 const accountName = localStorage.getItem("account");
 let allEmojis = [];
 let userData;
@@ -105,6 +113,7 @@ async function format(msg, embeds) {
   const boldRegex = /\*\*(.*?)\*\*/g;
   const strikethroughRegex = /~~(.*?)~~/g;
   const underlineRegex = /__(.*?)__/g;
+  const userRegex = /@([a-zA-Z0-9_]+)\b/g;
   let builtEmbeds = [];
 
   msg = msg
@@ -142,7 +151,11 @@ async function format(msg, embeds) {
         )}</reply></a>`;
       }
     })
-    .replace(/\\/g, "<span class='none'>\\</span>")
+    .replace(userRegex, function (match) {
+      let username = match.replace("@", "");
+      const href = `<a href="/user/${username}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+      return href;
+    })
     .replace(/\n/g, "<br>");
 
   if (embeds) {
@@ -198,7 +211,7 @@ async function format(msg, embeds) {
   return resJson;
 }
 
-function clean(msg, embeds) {
+function clean(msg) {
   const codeRegex = /`(.*?)`/g;
   const emojiRegex = /:(.*?):/g;
   const linkRegex =
@@ -208,8 +221,7 @@ function clean(msg, embeds) {
   const boldRegex = /\*\*(.*?)\*\*/g;
   const strikethroughRegex = /~~(.*?)~~/g;
   const underlineRegex = /_(.*?)_/g;
-  let builtEmbeds = [];
-
+  const userRegex = /@([a-zA-Z0-9_]+)\b/g;
   msg = msg
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -233,34 +245,33 @@ function clean(msg, embeds) {
     .replace(italicsRegex, "<i>$1</i>")
     .replace(strikethroughRegex, "<s>$1</s>")
     .replace(underlineRegex, "<u>$1</u>")
-    .replace(/\\/g, "<span class='none'>\\</span>")
+    .replace(userRegex, function (match) {
+      let username = match.replace("@", "");
+      const href = `<a href="/user/${username}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+      return href;
+    })
     .replace(/\n/g, "<br>");
 
   return msg;
 }
 
-function overlay(data) {
+function overlay(data, id = `overlay-${Date.now()}`) {
   if (!data || !data.type) throw new Error("Overlay type not specified");
   if (!data.title) throw new Error("Overlay title not specified");
   if (data.type == "text") {
     const overlayBg = document.createElement("div");
     overlayBg.classList = "overlay-background";
+    overlayBg.id = id;
     overlayBg.style.opacity = 0;
     overlayBg.onclick = (e) => {
       if (e.target != overlayBg) return;
-      overlayBg.style.opacity = 0;
-      setTimeout(() => {
-        overlayBg.remove();
-      }, 100);
+      closeOverlay(id);
     };
     function keyDown(e) {
       if (e.key == "Escape") {
         e.preventDefault();
         document.removeEventListener(e, keyDown);
-        overlayBg.style.opacity = 0;
-        setTimeout(() => {
-          overlayBg.remove();
-        }, 100);
+        closeOverlay(id);
       }
     }
     document.addEventListener("keydown", keyDown);
@@ -286,22 +297,17 @@ function overlay(data) {
   } else if (data.type == "html") {
     const overlayBg = document.createElement("div");
     overlayBg.classList = "overlay-background";
+    overlayBg.id = id;
     overlayBg.style.opacity = 0;
     overlayBg.onclick = (e) => {
       if (e.target != overlayBg) return;
-      overlayBg.style.opacity = 0;
-      setTimeout(() => {
-        overlayBg.remove();
-      }, 100);
+      closeOverlay(id);
     };
     function keyDown(e) {
       if (e.key == "Escape") {
         e.preventDefault();
         document.removeEventListener(e, keyDown);
-        overlayBg.style.opacity = 0;
-        setTimeout(() => {
-          overlayBg.remove();
-        }, 100);
+        closeOverlay(id);
       }
     }
     document.addEventListener("keydown", keyDown);
@@ -325,6 +331,15 @@ function overlay(data) {
       overlayBg.style.opacity = 1;
     }, 100);
   }
+  return id;
+}
+
+function closeOverlay(id) {
+  const overlay = document.getElementById(id);
+  overlay.style.opacity = 0;
+  setTimeout(() => {
+    overlay.remove();
+  }, 100);
 }
 
 const load = document.querySelector("load");
@@ -332,5 +347,54 @@ setTimeout(() => {
   load.style.opacity = 0;
   setTimeout(() => {
     load.remove();
+    if (popupParam) {
+      popup(popupParam);
+    }
   }, 100);
 }, 750);
+
+function copyText(txt) {
+  navigator.clipboard.writeText(txt);
+  popup("Copied text!");
+}
+
+function download(str, format, name = "download") {
+  const el = document.createElement("a");
+  const mimeTypes = {
+    txt: "text/plain",
+    csv: "text/csv",
+    json: "application/json",
+    xml: "application/xml",
+    pdf: "application/pdf",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    gif: "image/gif",
+    bmp: "image/bmp",
+    svg: "image/svg+xml",
+    zip: "application/zip",
+    rar: "application/x-rar-compressed",
+    exe: "application/octet-stream",
+  };
+
+  let mimeType;
+  if (mimeTypes[format]) {
+    mimeType = mimeTypes[format];
+  } else {
+    console.warn(`Unsupported file extension: ${format}`);
+    return;
+  }
+
+  el.setAttribute(
+    "href",
+    `data:${mimeType};charset=utf-8,${encodeURIComponent(str)}`,
+  );
+  el.setAttribute("download", `${name}.${format}`);
+  el.style.display = "none";
+  document.body.appendChild(el);
+  el.click();
+  document.body.removeChild(el);
+}

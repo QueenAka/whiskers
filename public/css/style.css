@@ -118,6 +118,13 @@
   scroll-behavior: smooth;
   color: var(--text);
   user-select: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 reply {
@@ -1046,4 +1053,9 @@ load img {
 
 .sp-r {
   margin-right: 5px;
+}
+
+.overlay button {
+  width: 100%;
+  margin-top: 5px;
 }

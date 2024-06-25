@@ -295,3 +295,30 @@ function logout() {
     body: `<p>Are you sure you want to logout?</p><button onclick="localStorage.removeItem('account');window.location.href='/';">Confirm</button>`,
   });
 }
+
+function deleteAccount() {
+  overlay({
+    type: "html",
+    title: "Delete Account",
+    body: `<p>Are you sure you want to delete your account? This cannot be undone and you will lose all of your data</p><button onclick="deleteConfirm()">Confirm</button>`,
+  });
+}
+
+function deleteConfirm() {
+  fetch("/api/delete", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: accountName,
+      password: userData.password,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) return popup("Failed too delete your account");
+      localStorage.removeItem("account");
+      window.location.href = "/?p=Account Deleted";
+    });
+}
