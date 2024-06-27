@@ -64,12 +64,7 @@ setTimeout(() => {
         chatTitle.innerHTML = clean(chat.name);
         chatTitle.classList = "name";
 
-        const chatAuthor = document.createElement("p");
-        chatAuthor.innerHTML = `@${chat.author}`;
-        chatAuthor.classList = "author";
-
         chatHead.appendChild(chatTitle);
-        chatHead.appendChild(chatAuthor);
 
         const chatDescription = document.createElement("p");
         chatDescription.innerHTML = clean(chat.description);

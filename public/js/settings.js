@@ -1,14 +1,12 @@
-document.getElementById("username").innerHTML = `@${accountName}`;
 const defaults = {
   account: {
     pfp: "/media/image/icons/profile.png",
-    displayName: accountName,
-    bio: "",
+    displayName: "Guest",
     nameColor: "#FFFFFF",
-    messageSound: "/media/audio/meow.mp3",
   },
   general: {
     appTheme: "poppy-seed",
+    messageSound: "/media/audio/meow.mp3",
     joinMessages: true,
     chatSounds: true,
     messageEmbeds: true,
@@ -22,6 +20,14 @@ const defaults = {
     displayIds: false,
   },
 };
+setTimeout(() => {
+  if (!s) {
+    console.log("No S");
+    s = defaults;
+    localStorage.setItem("settings", JSON.stringify(s));
+  }
+  displaySettings();
+}, 500);
 
 const imgInput = document.getElementById("image-input");
 imgInput.addEventListener("change", function (e) {
@@ -99,7 +105,6 @@ function toggleSettings(type) {
 }
 
 function displaySound(value) {
-  if (value == "custom") return;
   const aud = new Audio(value);
   aud.play();
 }
@@ -111,7 +116,6 @@ function displayTheme(theme) {
 
 const pfp = document.getElementById("pfp");
 const displayName = document.getElementById("displayName");
-const bio = document.getElementById("bio");
 const nameColor = document.getElementById("nameColor");
 const messageSound = document.getElementById("messageSound");
 const appTheme = document.getElementById("appTheme");
@@ -129,9 +133,8 @@ const displayIds = document.getElementById("displayIds");
 function displaySettings() {
   pfp.src = s.account.pfp;
   displayName.value = s.account.displayName;
-  bio.value = s.account.bio;
   nameColor.value = s.account.nameColor;
-  messageSound.value = s.account.messageSound;
+  messageSound.value = s.general.messageSound;
   appTheme.value = s.general.appTheme;
   joinMessages.checked = s.general.joinMessages;
   chatSounds.checked = s.general.chatSounds;
@@ -142,87 +145,36 @@ function displaySettings() {
   devMode.checked = s.advanced.devMode;
   reconnectPopups.checked = s.advanced.reconnectPopups;
   displayIds.checked = s.advanced.displayIds;
+  displayTheme(s.general.appTheme);
 }
 
 function saveSettings(type) {
   if (type == "account") {
     s.account.pfp = pfp.src;
     s.account.displayName = displayName.value;
-    s.account.bio = bio.value;
     s.account.nameColor = nameColor.value;
-    s.account.messageSound = messageSound.value;
-    fetch("/api/update", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: accountName,
-        json: s[type],
-        type: type,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) return popup("Failed too save settings");
-        popup("Settings saved");
-        displaySettings();
-      });
   } else if (type == "general") {
     s.general.appTheme = appTheme.value;
+    s.general.messageSound = messageSound.value;
     s.general.joinMessages = joinMessages.checked;
     s.general.chatSounds = chatSounds.checked;
     s.general.messageEmbeds = messageEmbeds.checked;
     s.general.showPfps = showPfps.checked;
     s.general.showNameColors = showNameColors.checked;
     s.general.showDisplayNames = showDisplayNames.checked;
-    fetch("/api/update", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: accountName,
-        json: s[type],
-        type: type,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) return popup("Failed too save settings");
-        popup("Settings saved");
-        displaySettings();
-      });
-  } else if (type == "advanced") {
+  } else {
     s.advanced.devMode = devMode.checked;
     s.advanced.reconnectPopups = reconnectPopups.checked;
     s.advanced.displayIds = displayIds.checked;
-    fetch("/api/update", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: accountName,
-        json: s[type],
-        type: type,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) return popup("Failed too save settings");
-        popup("Settings saved");
-        displaySettings();
-      });
   }
+  localStorage.setItem("settings", JSON.stringify(s));
+  popup(`Saved ${type} settings!`);
 }
 
 function resetSettings(type) {
   s[type] = defaults[type];
   displaySettings();
 }
-
-setTimeout(() => displaySettings(), 500);
 
 const contextObj = {
   nameColor: {
@@ -287,38 +239,3 @@ contexts.forEach((context) => {
     overlay(contextObj[context.id.split("-")[1]]);
   });
 });
-
-function logout() {
-  overlay({
-    type: "html",
-    title: "Logout",
-    body: `<p>Are you sure you want to logout?</p><button onclick="localStorage.removeItem('account');window.location.href='/';">Confirm</button>`,
-  });
-}
-
-function deleteAccount() {
-  overlay({
-    type: "html",
-    title: "Delete Account",
-    body: `<p>Are you sure you want to delete your account? This cannot be undone and you will lose all of your data</p><button onclick="deleteConfirm()">Confirm</button>`,
-  });
-}
-
-function deleteConfirm() {
-  fetch("/api/delete", {
-    method: "post",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: accountName,
-      password: userData.password,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) return popup("Failed too delete your account");
-      localStorage.removeItem("account");
-      window.location.href = "/?p=Account Deleted";
-    });
-}

@@ -6,9 +6,6 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const TENOR = "AIzaSyDtGZn8kVMJwn07uU8BKDEwieHLSKbIRFE";
-const pw = createPassword(Math.floor(Math.random() * 10) + 10);
-console.log("Admin Password: ", pw);
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, "public/media/uploads"));
@@ -18,13 +15,14 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now().toString()}.${ext}`);
   },
 });
-
 const uploadsDir = path.join(__dirname, "public/media/uploads");
+let chats = [];
+
+// functions
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-// functions
 function sendToClients(msg, url) {
   const clientsToSend = clients.filter((client) => {
     return client.url === url;
@@ -32,23 +30,6 @@ function sendToClients(msg, url) {
   clientsToSend.forEach((client) => {
     client.res.write("data: " + msg);
   });
-}
-
-function createPassword(length) {
-  const characterPool =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const randomNumber = new Uint8Array(length);
-
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    do {
-      crypto.getRandomValues(randomNumber);
-    } while (randomNumber[0] >= characterPool.length);
-
-    password += characterPool[randomNumber[0]];
-  }
-
-  return password;
 }
 
 function loadEmojis() {
@@ -121,6 +102,7 @@ async function imgurSearch(q, next = 1) {
   };
 }
 
+// Middleware
 let clients = [];
 let emojisList = [];
 
@@ -130,7 +112,7 @@ app.use(
   express.static(path.join(__dirname, "public"), { extensions: ["html"] }),
 );
 
-// Events
+// Events, Inaccessible via 3rd party apps
 app.get("/events/get", (req, res) => {
   let id = req.query.id;
   let client = clients.find((c) => c.id === id);
@@ -227,171 +209,6 @@ app.post("/events/post", (req, res) => {
   }
 });
 
-// Accounts
-app.post("/api/signup", async (req, res) => {
-  try {
-    let username = req.body.username;
-    let password = req.body.password;
-    let usernameRegex = /^[a-z0-9_]+$/g;
-    if (username.length < 3 || username.length > 20) {
-      return res
-        .status(400)
-        .json({ error: "Username must be between 3 and 20 characters long" });
-    } else if (!username.match(usernameRegex)) {
-      return res.status(400).json({
-        error: "Username must only contain letters, numbers, and underscores",
-      });
-    } else if (password.length < 8) {
-      return res
-        .status(400)
-        .json({ error: "Password must be at least 8 characters long" });
-    }
-    let data = JSON.parse(
-      fs.readFileSync(path.join(__dirname, "private/data/users.json")),
-    );
-    if (data[username])
-      return res
-        .status(403)
-        .json({ error: "User with this username already exists." });
-    data[username] = {
-      password,
-      settings: {
-        account: {
-          pfp: "/media/image/icons/profile.png",
-          displayName: username,
-          bio: "",
-          nameColor: "#FFFFFF",
-          messageSound: "/media/audio/meow.mp3",
-        },
-        general: {
-          appTheme: "poppy-seed",
-          joinMessages: true,
-          chatSounds: true,
-          pushNotif: false,
-          messageEmbeds: true,
-          showPfps: true,
-          showNameColors: true,
-          showDisplayNames: true,
-        },
-        advanced: {
-          devMode: false,
-          reconnectPopups: false,
-          displayIds: false,
-        },
-      },
-    };
-
-    fs.writeFileSync(
-      path.join(__dirname, "private/data/users.json"),
-      JSON.stringify(data),
-    );
-    res.json({
-      success: true,
-      data: data[username],
-      name: username,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "An error occurred during signup." });
-    console.log(error);
-  }
-});
-
-app.post("/api/login", async (req, res) => {
-  try {
-    let username = req.body.username;
-    let password = req.body.password;
-    let data = JSON.parse(
-      fs.readFileSync(path.join(__dirname, "private/data/users.json")),
-    );
-    let user = data[username];
-
-    if (!user) return res.status(404).json({ error: "User not found." });
-    if (user.password !== password)
-      return res.status(403).json({ error: "Incorrect username or password." });
-
-    res.json({ success: true, user, name: username });
-  } catch (error) {
-    res.status(500).json({ error: "An error occurred during login." });
-    console.log(error);
-  }
-});
-
-app.post("/api/delete", async (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  const data = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/users.json"), "utf-8"),
-  );
-  const user = data[username];
-  if (!user) return res.status(404).json({ error: "User not found" });
-  if (user.password !== password)
-    return res.status(403).json({ error: "Incorrect username or password" });
-  delete data[username];
-  fs.writeFileSync(
-    path.join(__dirname, "private/data/users.json"),
-    JSON.stringify(data),
-  );
-  res.json({ res: "Success" });
-});
-
-app.post("/api/update", async (req, res) => {
-  let username = req.body.username;
-  let json = req.body.json;
-  let type = req.body.type;
-  if (!type) return res.status(400).json({ error: "No type specified." });
-
-  let data = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/users.json")),
-  );
-
-  if (!data[username])
-    return res.status(404).json({ error: "User not found." });
-  if (!data[username].settings[type])
-    return res.status(400).json({ error: "Invalid type." });
-  data[username].settings[type] = json;
-  fs.writeFileSync(
-    path.join(__dirname, "private/data/users.json"),
-    JSON.stringify(data),
-  );
-  res.json({ res: "Success" });
-});
-
-app.post("/api/settings", async (req, res) => {
-  let username = req.body.username;
-  let data = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/users.json")),
-  );
-  if (!data[username])
-    return res.status(403).json({ error: "User not found." });
-  res.status(200).json({ res: "Success", json: data[username] });
-});
-
-app.get("/user/:username", async (req, res) => {
-  let username = req.params.username;
-  let data = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/users.json")),
-  );
-  if (!data[username])
-    return res
-      .status(404)
-      .sendFile(path.join(__dirname, "private/html/404.html"));
-  res.status(200).sendFile(path.join(__dirname, "private/html/user.html"));
-});
-
-app.get("/api/user/:username", async (req, res) => {
-  const username = req.params.username;
-  let data = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/users.json")),
-  );
-
-  if (!data[username]) {
-    return res.status(404).json({ error: "User not found" });
-  }
-
-  delete data[username].password;
-  res.status(200).json({ res: "Success", json: data[username] });
-});
-
 // Chats
 app.post("/api/new", async (req, res) => {
   let author = req.body.username;
@@ -442,15 +259,17 @@ app.get("/api/chats/:chatId", async (req, res) => {
 app.get("/chats/:chatId", async (req, res) => {
   let chatId = req.params.chatId;
   if (!chatId) return res.redirect("/");
-  let chat = JSON.parse(
+  let chats = JSON.parse(
     fs.readFileSync(path.join(__dirname, "private/data/chats.json")),
-  )[chatId];
-  if (!chat) return res.status(404).redirect("/404");
-  if (chat.visibiility == "private") {
-    res.status(403).redirect(`/chats/auth/${chatId}`);
-  } else {
-    res.sendFile(path.join(__dirname, "private/html/chat.html"));
-  }
+  );
+  const chat = chats.find((c) => c.id === chatId);
+  if (!chat)
+    return res
+      .status(404)
+      .sendFile(path.join(__dirname, "private/html/404.html"));
+  if (chat.visibility.type == "private")
+    return res.status(403).redirect(`/chats/auth/${chatId}`);
+  res.sendFile(path.join(__dirname, "private/html/chat.html"));
 });
 
 // Misc
@@ -516,80 +335,6 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
       }
     });
   }, 60000);
-});
-
-// Admin settings
-app.get("/admin", async (req, res) => {
-  const upw = req.query.pw;
-  if (!upw) return res.status(400).json({ error: "No password provided" });
-  if (upw != pw) return res.status(403).json({ error: "Incorrect password" });
-  res.sendFile(path.join(__dirname, "private/html/admin.html"));
-});
-
-app.get("/admin/accounts", async (req, res) => {
-  const upw = req.query.pw;
-  if (!upw) return res.status(400).json({ error: "No password provided" });
-  if (upw != pw) return res.status(403).json({ error: "Incorrect password" });
-  const json = fs.readFileSync(
-    path.join(__dirname, "private/data/users.json"),
-    "utf-8",
-  );
-  res.json(JSON.parse(json));
-});
-
-app.get("/admin/shutdown", async (req, res) => {
-  const upw = req.query.pw;
-  if (!upw) return res.status(400).json({ error: "No password provided" });
-  if (upw != pw) return res.status(403).json({ error: "Incorrect password" });
-  res.json({ res: "Shutting server down..." });
-  setTimeout(() => {
-    process.exit(0);
-  }, 500);
-});
-
-app.post("/admin/eval", async (req, res) => {
-  const upw = req.query.pw;
-  if (!upw) return res.status(400).json({ error: "No password provided" });
-  if (upw != pw) return res.status(403).json({ error: "Incorrect password" });
-  const code = req.body.code;
-  if (!code) return res.status(400).json({ error: "No code provided" });
-  try {
-    const result = eval(code);
-    res.json({ result: result });
-  } catch (e) {
-    res.json({ result: e.message });
-  }
-});
-
-app.post("/admin/delete", async (req, res) => {
-  const upw = req.query.pw;
-  if (!upw) return res.status(400).json({ error: "No password provided" });
-  if (upw != pw) return res.status(403).json({ error: "Incorrect password" });
-  const user = req.body.user;
-  if (!user) return res.status(400).json({ error: "No user provided" });
-  const data = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/users.json"), "utf-8"),
-  );
-  if (!data[user]) return res.status(404).json({ error: "User not found" });
-  delete data[user];
-  fs.writeFileSync(
-    path.join(__dirname, "private/data/users.json"),
-    JSON.stringify(data),
-  );
-  res.json({ res: "Success" });
-});
-
-app.post("/admin/fullchange", async (req, res) => {
-  const upw = req.query.pw;
-  if (!upw) return res.status(400).json({ error: "No password provided" });
-  if (upw != pw) return res.status(403).json({ error: "Incorrect password" });
-  const json = req.body.json;
-  if (!json) return res.status(400).json({ error: "No JSON provided" });
-  fs.writeFileSync(
-    path.join(__dirname, "private/data/users.json"),
-    JSON.stringify(json),
-  );
-  res.json({ res: "Success" });
 });
 
 // Server config

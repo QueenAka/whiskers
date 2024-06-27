@@ -159,7 +159,7 @@ button:active {
   transform: scale(0.95);
 }
 
-input[type=text], input[type=color], input[type=password] {
+input[type=text], input[type=color], input[type=password], #msginp {
   background-color: var(--secondary);
   border: none;
   border-radius: 5px;
@@ -179,17 +179,18 @@ input[type=text]:focus, input[type=password]:focus {
 
 nav {
   height: 50px;
-  width: 100%;
+  width: calc(100% - 10px);
   background-color: var(--highlights);
   position: fixed;
   top: 0;
   left: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   font-weight: bold;
   z-index: 999;
   color: var(--text);
+  padding: 0 5px;
 }
 
 .desktopApp nav {
@@ -199,6 +200,11 @@ nav {
 nav img {
   width: 30px;
   height: 30px;
+  margin: 5px;
+}
+
+#profileNav {
+  border-radius: 50%;
 }
 
 nav a {
@@ -250,30 +256,10 @@ nav a {
   margin-top: 130px;
 }
 
-.user {
-  position: fixed;
-  left: 10px;
-  color: var(--text);
-  border-radius: 50%;
-}
-
-.settings {
-  position: fixed;
-  right: 10px;
-  color: var(--text);
-}
-
-.logo {
-  width: 30px;
-  height: 30px;
-  margin: 5px;
-  color: var(--text);
-}
-
 .bottom-nav {
-  position: relative;
-  width: 100%;
-  height: 50px;
+  position: fixed;
+  width: calc(100% - 5px);
+  height: fit-content;
   background-color: var(--background);
   display: flex;
   align-items: center;
@@ -281,14 +267,21 @@ nav a {
   color: var(--text);
   z-index: 999;
   border-top: 2px solid var(--highlights);
+  padding: 5px 2.5px;
+  bottom: 0;
+  left: 0;
 }
 
 #msginp {
-  width: calc(100% - 105px);
+  width: calc(100% - 115px);
   height: 20px;
+  line-height: 20px;
+  max-height: 80px;
   color: var(--text);
   border-radius: 5px;
   padding-right: 105px;
+  font-weight: normal;
+  resize: none;
 }
 
 .bottom-nav .icons {
@@ -304,10 +297,6 @@ nav a {
 
 #msginp:focus {
   box-shadow: none;
-}
-
-.messageContent * {
-  margin: 0;
 }
 
 .icon {
@@ -570,11 +559,15 @@ warn {
   display: block;
 }
 
-.messageContent {
-  display: flex;
-  justify-content: left;
-  align-items: center;
-  flex-wrap: wrap;
+.messageContent * {
+  margin: 0;
+}
+
+.messageContent br {
+  margin: 0;
+  line-height: 0;
+  height: 0;
+  margin: 0;
 }
 
 reply * {
@@ -834,10 +827,6 @@ code {
   top: 10px;
   left: 7.5px;
   margin: 0;
-}
-
-.msgr:active {
-  background: var(--background);
 }
 
 .input-type {

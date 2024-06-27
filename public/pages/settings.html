@@ -16,21 +16,12 @@
       <img src="/media/image/icons/logo.png" />
     </load>
     <nav>
-      <img
-        width="30px"
-        height="30px"
-        class="user"
-        onclick="goto('/pages/user')"
-        src="/media/image/icons/profile.png"
-      />
+      <img src="/media/image/icons/profile.png" id="profileNav" />
       <a id="home" href="/">
-        <img class="logo" src="/media/image/icons/logo.png" />
+        <img src="/media/image/icons/logo.png" />
         Whiskers
       </a>
       <img
-        width="30px"
-        height="30px"
-        class="settings"
         onclick="goto('/pages/settings')"
         src="/media/image/icons/settings.png"
       />
@@ -44,66 +35,9 @@
           <img src="/media/image/icons/profile.png" id="pfp" />
           <div id="account-pfp-change" onclick="imgInput.click()"></div>
           <input placeholder="Display Name" id="displayName" />
-          <span class="lt" id="username">@test</span>
-          <textarea id="bio" placeholder="Bio"></textarea>
-          <div class="option">
-            <span class="toggle" onclick="toggle('accAdv')"
-              >Advanced
-              <img
-                src="/media/image/icons/down.png"
-                id="accAdv-toggle"
-                class="arrow"
-            /></span>
-            <div id="accAdv-content" class="toggle-content">
-              <div class="option">
-                Name color
-                <img
-                  src="/media/image/icons/context.png"
-                  id="context-nameColor"
-                  class="context"
-                />
-                <input type="color" id="nameColor" />
-              </div>
-              <div class="option">
-                Message sound
-                <img
-                  src="/media/image/icons/context.png"
-                  id="context-messageSound"
-                  class="context"
-                />
-                <select id="messageSound" onchange="displaySound(this.value)">
-                  <option value="/media/audio/meow.mp3">Meow</option>
-                  <option value="/media/audio/bark.mp3">Bark</option>
-                  <option value="/media/audio/ding.mp3">Ding</option>
-                  <option value="/media/audio/woosh.mp3">Woosh</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="option">
-            <span class="toggle" onclick="toggle('password')"
-              >Danger zone
-              <img
-                src="/media/image/icons/down.png"
-                id="password-toggle"
-                class="arrow"
-            /></span>
-            <div id="password-content" class="toggle-content">
-              <div class="option">
-                Delete account
-                <button onclick="deleteAccount()">Delete</button>
-              </div>
-              <div class="option">
-                Log out
-                <button onclick="logout()">Log out</button>
-              </div>
-              <div class="option">
-                Change password
-                <button onclick="changePass()">Change</button>
-              </div>
-            </div>
-          </div>
+          <input type="color" id="nameColor" />
         </div>
+
         <div class="buttons">
           <div class="left">
             <button onclick="resetSettings('account')">Reset</button>
@@ -129,6 +63,20 @@
               <option value="bubble-gum">Bubble Gum</option>
               <option value="sunrise">Sunrise</option>
               <option value="midnight">Midnight</option>
+            </select>
+          </div>
+          <div class="option">
+            Message sound
+            <img
+              src="/media/image/icons/context.png"
+              id="context-messageSound"
+              class="context"
+            />
+            <select id="messageSound" onchange="displaySound(this.value)">
+              <option value="/media/audio/meow.mp3">Meow</option>
+              <option value="/media/audio/bark.mp3">Bark</option>
+              <option value="/media/audio/ding.mp3">Ding</option>
+              <option value="/media/audio/woosh.mp3">Woosh</option>
             </select>
           </div>
           <div class="option">

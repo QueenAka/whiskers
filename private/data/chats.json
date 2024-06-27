@@ -1,9 +1,42 @@
-{
-  "general": {
-    "name": "General Chat",
-    "description": "A general chat for all to talk about anything and everything!",
-    "author": "akatech",
-    "visibility": { "type": "public" },
-    "id": "general"
+[
+  {
+    "id": "general",
+    "name": "General",
+    "description": "A chat for all users to talk about anything and everything",
+    "visibility": {
+      "type": "public"
+    }
+  },
+  {
+    "id": "games",
+    "name": "Games",
+    "description": "Like games? Well so do we! Come chat about your favorite games!",
+    "visibility": {
+      "type": "public"
+    }
+  },
+  {
+    "id": "programming",
+    "name": "Programming",
+    "description": "Discuss coding languages, frameworks, algorithms, and share your projects",
+    "visibility": {
+      "type": "public"
+    }
+  },
+  {
+    "id": "movies",
+    "name": "Movies",
+    "description": "Share movie recommendations, discuss new releases, or debate classic films",
+    "visibility": {
+      "type": "public"
+    }
+  },
+  {
+    "id": "travel",
+    "name": "Travel",
+    "description": "Explore destinations, share travel tips, and swap stories from your adventures",
+    "visibility": {
+      "type": "public"
+    }
   }
-}
+]

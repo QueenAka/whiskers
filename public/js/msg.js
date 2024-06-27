@@ -3,67 +3,19 @@ urlObj.search = "";
 urlObj.hash = "";
 const url = urlObj.toString();
 const inputData = {};
-let uname;
-let dname;
+const mainInput = document.getElementById("msginp");
+let dname = s.account.displayName;
 let lastMsgPfp = false;
 let lastUser;
 let clientId;
+let uname;
 let emojiOpened = false;
 let loadingMessages = [];
 let msgTimeout = setTimeout(() => {
   lastUser = null;
 }, 60000);
-
-fetch("/api/settings", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    username: accountName,
-  }),
-})
-  .then((res) => res.json())
-  .then((data) => {
-    if (data.error) {
-      localStorage.removeItem("account");
-      goto("/pages/user?r=" + window.location.href);
-      return;
-    }
-    if (data.res == "Success") {
-      userData = data.json;
-      if (userData != null) {
-        lastUser = null;
-        uname = accountName;
-        dname = userData.settings.account.displayName;
-
-        fetch("/events/post", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            type: "chatJoin",
-            url: url,
-            data: {
-              username: uname,
-              displayName: dname,
-              joinMessages: userData.settings.general.joinMessages,
-            },
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            clientId = data.id;
-            startEventFlow();
-          });
-      }
-    } else {
-      goto("/pages/user?r=" + window.location.href);
-    }
-  });
-
 document.getElementById("msginp").addEventListener("keydown", (e) => {
+  const isMobile = document.querySelector("html.mobile");
   function addSymbol(s) {
     l = s.split("").length;
     e.preventDefault();
@@ -79,7 +31,8 @@ document.getElementById("msginp").addEventListener("keydown", (e) => {
     e.target.selectionEnd = selEnd + l;
     e.target.selectionStart = selStart + l;
   }
-  if (e.key === "Enter") {
+  if (e.key === "Enter" && !isMobile) {
+    if (e.shiftKey) return;
     e.preventDefault();
     send();
   } else if (e.key === "b" && e.ctrlKey) {
@@ -94,6 +47,28 @@ document.getElementById("msginp").addEventListener("keydown", (e) => {
     addSymbol(":");
   }
 });
+
+fetch("/events/post", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    type: "chatJoin",
+    url: url,
+    data: {
+      username: "Waiting...",
+      displayName: dname,
+      joinMessages: s.general.joinMessages,
+    },
+  }),
+})
+  .then((res) => res.json())
+  .then((data) => {
+    clientId = data.id;
+    uname = clientId;
+    startEventFlow();
+  });
 
 function highlight(id) {
   let doc = document.getElementById(`msg-${id}`);
@@ -255,7 +230,6 @@ function removeReply(msg) {
 }
 
 function send() {
-  document.getElementById("msginp").focus();
   const msg = document.getElementById("msginp").value;
   if (msg.trim().length < 1) return;
   if (msg.trim().length > 2000) return popup("Message too long!");
@@ -381,15 +355,21 @@ function messageReceiver(event) {
     buildMessage(message, "message");
   } else if (message.type == "messageDelete") {
     const id = message.data.id;
-    const msg = document.getElementById(`msg-${id}`);
-    msg.remove();
+    const content = document.getElementById(`content-${id}`);
+    if (!content) return;
+    const unparsed = document.getElementById(`unparsed-${id}`);
+    content.innerHTML = `<p class='lt'>[DELETED]</p>`;
+    unparsed.value = `[DELETED]`;
+    content.id = `deleted-content-${id}`;
+    unparsed.id = `deleted-unparsed-${id}`;
   } else if (message.type == "messageEdit") {
     const data = JSON.parse(message.data);
     const id = data.id;
     const content = document.getElementById(`content-${id}`);
+    if (!content) return;
     const unparsed = document.getElementById(`unparsed-${id}`);
     content.innerHTML =
-      clean(data.content) + "<h6 class='lt sp-l'>(edited)</h6>";
+      clean(data.content) + "<span class='lt sp-l'>(edited)</span>";
     unparsed.value = data.content;
   }
 }
@@ -416,6 +396,9 @@ async function buildMessage(message, type) {
     let displayName = messageData.author.displayName;
     if (!s.general.showDisplayNames && username != message.id)
       displayName = `@${username}`;
+    else {
+      if (username != message.id) displayName = clean(displayName);
+    }
     let nameColor = messageData.author.nameColor;
     if (!s.general.showNameColors) nameColor = "#ffffff";
     const pfp = messageData.author.pfp;
@@ -430,7 +413,7 @@ async function buildMessage(message, type) {
       messageObject = await format(messageData.content, true);
 
     if (username == msgId) {
-      displayName = messageData.content;
+      displayName = messageObject.message;
       messageObject.message = "";
     }
 
@@ -449,14 +432,14 @@ async function buildMessage(message, type) {
 
     const authorSpan = document.createElement("b");
     authorSpan.id = msgId;
-    authorSpan.innerHTML = clean(displayName);
+    authorSpan.innerHTML = displayName;
     authorSpan.style.color = nameColor || "white";
 
     const dateSpan = document.createElement("span");
     dateSpan.classList.add("lt");
     dateSpan.innerHTML = ` ${formateDate(new Date())}`;
 
-    const unparsed = document.createElement("input");
+    const unparsed = document.createElement("textarea");
     unparsed.style.display = "none";
     unparsed.id = `unparsed-${msgId}`;
     unparsed.value = messageData.content;
@@ -472,10 +455,10 @@ async function buildMessage(message, type) {
     const bottomSpan = document.createElement("span");
     bottomSpan.classList.add("messageContent");
     bottomSpan.id = `content-${msgId}`;
+    bottomSpan.innerHTML = messageObject.message;
 
     let embeds = messageObject.embeds.length > 0;
     let embedDivs = document.createElement("div");
-    bottomSpan.innerHTML = messageObject.message;
     if (embeds) {
       messageObject.embeds.forEach(async (embed) => {
         if (embed.media) {
@@ -536,8 +519,9 @@ async function buildMessage(message, type) {
       copyMsg.classList.add("item");
       copyMsg.innerHTML = "Copy Text <img src='/media/image/icons/copy.png' />";
       copyMsg.onclick = () => {
-        const text = document.getElementById(`unparsed-${msgId}`).value;
-        copyText(text);
+        const unparsed = document.getElementById(`unparsed-${msgId}`);
+        if (unparsed) copyText(text);
+        else popup("Failed to copy text");
         if (document.querySelector("html.mobile")) {
           menu.style.bottom = "-100%";
         } else {
@@ -653,7 +637,7 @@ async function buildMessage(message, type) {
     }
 
     resetTimer();
-    aud = s.account.messageSound;
+    aud = s.general.messageSound;
     if (username != uname) {
       var audio = new Audio(aud);
       audio.loop = false;
@@ -669,9 +653,11 @@ async function buildMessage(message, type) {
     let displayName = messageData.author.displayName;
     if (!s.general.showDisplayNames && username != message.id)
       displayName = `@${username}`;
+    else {
+      if (username != message.id) displayName = clean(displayName);
+    }
     let nameColor = messageData.author.nameColor;
     if (!s.general.showNameColors) nameColor = "#ffffff";
-    const pfp = messageData.author.pfp;
     const dontShowPfp = username == msgId || !s.general.showPfps;
     let appendUser = username != lastUser;
     let messageObject = {};
@@ -679,7 +665,7 @@ async function buildMessage(message, type) {
     messageObject.embeds = [];
 
     if (username == msgId) {
-      displayName = messageData.content;
+      displayName = messageObject.message;
       messageObject.message = "";
     }
 
@@ -695,22 +681,16 @@ async function buildMessage(message, type) {
 
     const pfpDiv = document.createElement("img");
     pfpDiv.classList.add("pfp");
-    pfpDiv.src = "/media/image/icons/profile.png";
+    pfpDiv.src = s.account.pfp;
 
     const authorSpan = document.createElement("b");
     authorSpan.id = msgId;
-    authorSpan.innerHTML = clean(displayName);
+    authorSpan.innerHTML = displayName;
     authorSpan.style.color = nameColor || "white";
 
     const dateSpan = document.createElement("span");
     dateSpan.classList.add("lt");
     dateSpan.innerHTML = ` ${formateDate(new Date())}`;
-
-    const unparsed = document.createElement("input");
-    unparsed.style.display = "none";
-    unparsed.id = `unparsed-${msgId}`;
-    unparsed.value = messageData.content;
-    msgDiv.appendChild(unparsed);
 
     if (!dontShowPfp) topDiv.appendChild(pfpDiv);
     topDiv.appendChild(authorSpan);
@@ -722,6 +702,7 @@ async function buildMessage(message, type) {
     const bottomSpan = document.createElement("span");
     bottomSpan.classList.add("messageContent");
     bottomSpan.id = `content-${msgId}`;
+    bottomSpan.innerHTML = messageObject.message;
 
     const bottomDiv = document.createElement("div");
     bottomDiv.appendChild(bottomSpan);
@@ -746,7 +727,6 @@ function sendToClients(json) {
 
 function replyMessage(id, auth) {
   document.getElementById("msginp").value = "";
-  document.getElementById("msginp").focus();
   inputData.type = "reply";
   inputData.id = id;
   const inputType = document.createElement("div");
@@ -777,7 +757,7 @@ function editMessage(id) {
   const prevType = document.getElementById("inputType");
   if (prevType) prevType.remove();
   msgInput.value = document.getElementById(`unparsed-${id}`).value;
-  msgInput.focus();
+  if (!msgInput.value) msgInput.focus();
   inputData.type = "edit";
   inputData.id = id;
   const inputType = document.createElement("div");
@@ -825,3 +805,9 @@ function uploadMedia() {
       });
   };
 }
+
+setInterval(() => {
+  mainInput.focus();
+  const lines = mainInput.value.split("\n").length;
+  mainInput.style.height = 20 * lines + "px";
+});

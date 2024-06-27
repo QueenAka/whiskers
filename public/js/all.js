@@ -13,50 +13,11 @@ if (popupParam) {
   window.history.pushState({}, "", updatedUrl);
 }
 
-const accountName = localStorage.getItem("account");
 let allEmojis = [];
 let userData;
-let s;
-
-if (!accountName) {
-  if (window.location.href.includes("/pages/chats"))
-    goto(`/pages/user?r=${window.location.href}`);
-  if (window.location.href.includes("/pages/settings")) goto("/pages/user");
-}
-
-if (accountName) {
-  fetch("/api/settings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: accountName,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        localStorage.removeItem("account");
-        if (window.location.href.includes("/pages/chats"))
-          goto(`/pages/user?r=${window.location.href}`);
-        else if (window.location.href.includes("/pages/settings"))
-          goto("/pages/user");
-        return;
-      } else {
-        userData = data.json;
-        if (userData != null) {
-          if (window.location.href.includes("/pages/user"))
-            goto("/pages/settings");
-        }
-        s = userData.settings;
-        document
-          .querySelector("html")
-          .setAttribute("theme", s.general.appTheme);
-        document.querySelector("img.user").src = s.account.pfp;
-      }
-    });
-}
+let s = JSON.parse(localStorage.getItem("settings"));
+if (!s && window.location.href.includes("/chats/")) goto(`/pages/settings`);
+if (s) document.getElementById("profileNav").src = s.account.pfp;
 
 fetch("/api/emojis")
   .then((res) => res.json())

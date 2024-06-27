@@ -1,5 +1,5 @@
 #account {
-  padding-top: 165px;
+  padding-top: 55px;
 }
 
 #pfp {
@@ -35,11 +35,11 @@
 
 #displayName {
   position: absolute;
-  top: 5px;
+  top: 10px;
   left: 55px;
   background: none;
   padding: 0;
-  width: calc(100% - 55px);
+  width: calc(100% - 155px);
   font-size: 20px;
   height: 20px;
   line-height: 15px;
@@ -47,23 +47,17 @@
   border-bottom: 2px solid var(--light-text);
 }
 
-#username {
+#nameColor {
+  width: 100px;
+  height: 20px;
+  padding: 0;
   position: absolute;
-  top: 30px;
-  left: 55px;
-}
-
-#bio {
-  position: absolute;
-  top: 55px;
-  left: 0;
-  width: calc(100% - 10px);
-  height: 95px;
-  padding: 5px;
-  background: var(--main);
+  top: 12px;
+  right: 0;
   border: none;
-  resize: none;
-  border-radius: 5px;
+  border-bottom: 2px solid var(--light-text);
+  border-radius: 0;
+  margin: 0;
 }
 
 .context, .arrow {
