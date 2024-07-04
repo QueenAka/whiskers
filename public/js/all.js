@@ -19,7 +19,7 @@ let s = JSON.parse(localStorage.getItem("settings"));
 if (!s && window.location.href.includes("/chats/")) goto(`/pages/settings`);
 if (s) {
   document.getElementById("profileNav").src = s.account.pfp;
-  document.querySelector("html").setAttribute("theme", s.general.theme);
+  document.querySelector("html").setAttribute("theme", s.general.appTheme);
 }
 
 fetch("/api/emojis")
