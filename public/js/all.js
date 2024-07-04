@@ -2,7 +2,7 @@ console.clear();
 let consoleBigRed = "color:red; font-size:40px;";
 console.log("%cSTOP!!", consoleBigRed);
 console.log(
-  "If you do not know what you are doing, you could be in danger of losing your account!\nDo not run code here unless you know EXACTLY what you are doing.\nLove from the Whiskers Team <3",
+  "To keep you safe, and make sure your client doesnt break, we suggest that you do not run code here unless you know EXACTLY what you are doing.\nLove from the Whiskers Team <3",
 );
 
 let params = new URLSearchParams(window.location.search);
@@ -17,7 +17,10 @@ let allEmojis = [];
 let userData;
 let s = JSON.parse(localStorage.getItem("settings"));
 if (!s && window.location.href.includes("/chats/")) goto(`/pages/settings`);
-if (s) document.getElementById("profileNav").src = s.account.pfp;
+if (s) {
+  document.getElementById("profileNav").src = s.account.pfp;
+  document.querySelector("html").setAttribute("theme", s.general.theme);
+}
 
 fetch("/api/emojis")
   .then((res) => res.json())
