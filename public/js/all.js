@@ -78,6 +78,7 @@ async function format(msg, embeds) {
   let builtEmbeds = [];
 
   msg = msg
+    .trim()
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(headerRegex, function (match, p1, p2) {
@@ -184,6 +185,7 @@ function clean(msg) {
   const underlineRegex = /_(.*?)_/g;
   const userRegex = /@([a-zA-Z0-9_]+)\b/g;
   msg = msg
+    .trim()
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(headerRegex, function (match, p1, p2) {

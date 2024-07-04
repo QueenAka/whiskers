@@ -274,14 +274,27 @@ nav a {
 
 #msginp {
   width: calc(100% - 115px);
-  height: 20px;
+  min-height: 20px;
   line-height: 20px;
+  height: fit-content;
   max-height: 80px;
   color: var(--text);
   border-radius: 5px;
   padding-right: 105px;
   font-weight: normal;
-  resize: none;
+  overflow: auto;
+  position: relative;
+}
+
+#msginp::before {
+  content: attr(placeholder);
+  color: var(--light-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 5px;
+  pointer-events: none;
+  height: 20px;
 }
 
 .bottom-nav .icons {
@@ -292,11 +305,7 @@ nav a {
   justify-content: center;
   position: absolute;
   right: 5px;
-  top: 10px;
-}
-
-#msginp:focus {
-  box-shadow: none;
+  bottom: 10px;
 }
 
 .icon {
@@ -563,13 +572,6 @@ warn {
   margin: 0;
 }
 
-.messageContent br {
-  margin: 0;
-  line-height: 0;
-  height: 0;
-  margin: 0;
-}
-
 reply * {
   color: var(--highlights);
 }
@@ -588,7 +590,7 @@ reply {
   width: 500px;
   height: calc(100% - 90px);
   position: absolute;
-  top: 90px;
+  top: 115px;
   left: 50%;
   transform: translateX(-50%);
   padding: 0 5px;
@@ -599,7 +601,7 @@ reply {
 }
 
 .desktopApp .cards {
-  top: 120px;
+  top: 155px;
   height: calc(100% - 120px);
 }
 
@@ -678,7 +680,7 @@ reply {
 
 .tabs {
   position: fixed;
-  top: 50px;
+  top: 80px;
   left: 0;
   width: 100%;
   height: 30px;
@@ -690,7 +692,7 @@ reply {
 }
 
 .desktopApp .tabs {
-  top: 80px;
+  top: 110px;
 }
 
 .tab {
@@ -892,8 +894,12 @@ code {
   padding: 10px;
   background: var(--background);
   border-radius: 10px;
-  margin: 5px;
+  margin: 5px 0;
   position: relative;
+}
+
+.mobile .embed {
+  width: calc(100% - 20px);
 }
 
 .embed h3 {
@@ -931,16 +937,13 @@ code {
   border-radius: 5px;
 }
 
-.user-img {
+.user-img, .user-video {
   max-width: 300px;
   border-radius: 10px;
-  background: var(--secondary);
 }
 
-.user-video {
-  max-width: 300px;
-  border-radius: 10px;
-  background: var(--secondary);
+.mobile .user-img, .mobile .user-video{
+  max-width: 100%;
 }
 
 .chooser .sidebar {
@@ -1047,4 +1050,216 @@ load img {
 .overlay button {
   width: 100%;
   margin-top: 5px;
+}
+
+footer {
+  background: var(--background);
+  position: fixed;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  z-index: 999;
+}
+
+footer a {
+  text-decoration: none;
+  font-size: 18px;
+  width: calc(100% / 5);
+  text-align: center;
+  display: inline-block;
+  height: 30px;
+  line-height: 30px;
+  color: var(--text);
+}
+
+.desktopApp footer {
+  top: 80px;
+}
+
+#account {
+  padding-top: 55px;
+}
+
+#pfp {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background: var(--secondary);
+  object-fit: contain;
+  object-position: center;
+}
+
+#account-pfp-change {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  background-image: url("/media/image/icons/image.png");
+  background-size: 30px;
+  background-position: center;
+  opacity: 0;
+  background-repeat: no-repeat;
+}
+
+#account-pfp-change:hover {
+  opacity: 1;
+}
+
+#displayName {
+  position: absolute;
+  top: 10px;
+  left: 55px;
+  background: none;
+  padding: 0;
+  width: calc(100% - 155px);
+  font-size: 20px;
+  height: 20px;
+  line-height: 15px;
+  border: none;
+  border-bottom: 2px solid var(--light-text);
+}
+
+#nameColor {
+  width: 100px;
+  height: 20px;
+  padding: 0;
+  position: absolute;
+  top: 12px;
+  right: 0;
+  border: none;
+  border-bottom: 2px solid var(--light-text);
+  border-radius: 0;
+  margin: 0;
+}
+
+.context, .arrow {
+  display: inline-block;
+  width: 1em;
+  vertical-align: middle;
+}
+
+.option {
+  position: relative;
+  margin-bottom: 5px;
+  height: fit-content;
+}
+
+.option label {
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%) scale(0.5);
+}
+
+.option.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.option select, .option button, .option input {
+  width: 100px;
+  height: 18px;
+  background: var(--background);
+  border: none;
+  border-bottom: 2px solid var(--light-text);
+  font-weight: bold;
+  text-align: left;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.option input[type="color"] {
+  border: none;
+}
+
+/* Switch script made by https://www.w3schools.com, modified by me */
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--secondary);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--highlights);
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+/* End of scripts */
+
+.toggle-content {
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+  transition: height 0.3s ease-in-out;
+}
+
+.option .toggle {
+  display: block;
+  width: 100%;
+  display: relative;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.option .toggle .arrow {
+  position: absolute;
+  top: 2.5px;
+  right: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+.cards.opts {
+  top: 50px;
 }

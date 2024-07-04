@@ -25,6 +25,13 @@
         src="/media/image/icons/settings.png"
       />
     </nav>
+    <footer>
+      <a href="/">Home</a>
+      <a href="/pages/settings">Settings</a>
+      <a href="https://github.com/QueenAka/whiskers">Source Code</a>
+      <a href="/pages/downloads">Downloads</a>
+      <a href="/pages/credits">Credits</a>
+    </footer>
     <div class="tabs">
       <div
         class="tab active"
@@ -57,24 +64,58 @@
     </div>
     <div id="news" class="cards"></div>
     <div id="publicChats" class="cards" style="display: none"></div>
-    <div id="joinChat" style="display: none">
-      <center class="center">
-        <h3>Join a Chat</h3>
-        <input placeholder="Chat ID..." type="text" id="joinId" />
-        <button
-          onclick="goto(`/chats/${document.getElementById('joinId').value}`)"
-        >
-          Join
-        </button>
-      </center>
+    <div id="joinChat" style="display: none" class="cards">
+      <div class="chat-card">
+        <div class="head">
+          <h3 class="name">Join a Chat</h3>
+        </div>
+        <div class="buttons">
+          <div class="left">
+            <input
+              placeholder="Chat ID"
+              id="joinChatId"
+              type="text"
+              style="margin: 0"
+            />
+          </div>
+          <div class="right">
+            <button
+              onclick="goto(`/chats/${document.getElementById('joinChatId').value}`)"
+            >
+              Join
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="createChat" style="display: none">
-      <center class="center">
-        <h2>Create a Chat</h2>
-        <h3>Chat Name</h3>
-        <input placeholder="Chat name..." type="text" /> <button>Create</button>
-        <warn>THIS DOES NOT CURRENTLY DO ANYTHING</warn>
-      </center>
+    <div id="createChat" style="display: none" class="cards">
+      <div class="chat-card">
+        <div class="head">
+          <h3 class="name">Create a Chat</h3>
+        </div>
+        <div class="body">
+          <div class="option">
+            Name
+            <input placeholder="Chat name..." />
+          </div>
+          <div class="option">
+            Visibility
+            <select>
+              <option>Public</option>
+              <option>Unlisted</option>
+              <option>Private</option>
+            </select>
+          </div>
+          <div class="option">
+            Description
+            <textarea placeholder="Chat description..."></textarea>
+          </div>
+          <div class="option">
+            Password
+            <input placeholder="Chat password..." type="password" />
+          </div>
+        </div>
+      </div>
     </div>
     <script src="/js/all.js"></script>
     <script src="/js/home.js"></script>

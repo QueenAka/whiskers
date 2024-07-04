@@ -14,7 +14,7 @@ let loadingMessages = [];
 let msgTimeout = setTimeout(() => {
   lastUser = null;
 }, 60000);
-document.getElementById("msginp").addEventListener("keydown", (e) => {
+mainInput.addEventListener("keydown", (e) => {
   const isMobile = document.querySelector("html.mobile");
   function addSymbol(s) {
     l = s.split("").length;
@@ -220,7 +220,7 @@ function loadImagesBar() {
 }
 
 function emojiClick(name) {
-  document.getElementById("msginp").value += ":" + name + ":";
+  mainInput.textContent += ":" + name + ":";
 }
 
 function removeReply(msg) {
@@ -230,10 +230,10 @@ function removeReply(msg) {
 }
 
 function send() {
-  const msg = document.getElementById("msginp").value;
+  const msg = mainInput.textContent;
   if (msg.trim().length < 1) return;
   if (msg.trim().length > 2000) return popup("Message too long!");
-  document.getElementById("msginp").value = "";
+  mainInput.textContent = "";
   let json;
   if (inputData.type == "reply") {
     json = {
@@ -260,7 +260,6 @@ function send() {
       }),
       url: url,
     };
-    removeInputType();
   } else {
     json = {
       type: "messageCreate",
@@ -277,7 +276,11 @@ function send() {
       url: url,
     };
   }
-  if (inputData.type != "edit") buildMessage(json, "temp");
+  if (inputData.type !== "edit") {
+    buildMessage(json, "temp");
+  } else {
+    removeInputType();
+  }
   sendToClients(json);
 }
 
@@ -349,7 +352,7 @@ async function startEventFlow() {
   });
 }
 
-function messageReceiver(event) {
+async function messageReceiver(event) {
   let message = JSON.parse(event.data);
   if (message.type == "messageCreate") {
     buildMessage(message, "message");
@@ -368,8 +371,57 @@ function messageReceiver(event) {
     const content = document.getElementById(`content-${id}`);
     if (!content) return;
     const unparsed = document.getElementById(`unparsed-${id}`);
+    const embedDivs = document.getElementById(`embeds-${id}`);
+    embedDivs.innerHTML = "";
+    let messageObject = {};
+    messageObject.message = clean(data.content);
+    messageObject.embeds = [];
+    if (s.general.messageEmbeds)
+      messageObject = await format(messageData.content, true);
+    const embeds = messageObject.embeds;
+    if (embeds) {
+      messageObject.embeds.forEach(async (embed) => {
+        if (embed.media) {
+          if (embed.media == "image") {
+            let img = document.createElement("img");
+            img.src = embed.url;
+            img.classList.add("user-img");
+            embedDivs.appendChild(img);
+          } else if (embed.media == "video" || embed.media == "audio") {
+            let doc = document.createElement(embed.media);
+            doc.controls = true;
+            doc.innerHTML = `<source src="${embed.url}">`;
+            doc.classList.add(`user-${embed.media}`);
+            embedDivs.appendChild(doc);
+          }
+        } else {
+          const embedDiv = document.createElement("div");
+          embedDiv.classList.add("embed");
+          embedDiv.onclick = () => {
+            window.open(embed.url, "_blank");
+          };
+
+          const title = document.createElement("h3");
+          title.innerHTML = clean(embed.title);
+          embedDiv.appendChild(title);
+
+          const description = document.createElement("p");
+          description.innerHTML = clean(embed.description);
+          embedDiv.appendChild(description);
+
+          if (embed.image) {
+            const image = document.createElement("img");
+            image.src = embed.image;
+            embedDiv.appendChild(image);
+          }
+
+          embedDivs.appendChild(embedDiv);
+        }
+      });
+    }
     content.innerHTML =
-      clean(data.content) + "<span class='lt sp-l'>(edited)</span>";
+      messageObject.message +
+      `<span class='lt sp-l'>(Edit ${formateDate(new Date())})</span>`;
     unparsed.value = data.content;
   }
 }
@@ -459,6 +511,7 @@ async function buildMessage(message, type) {
 
     let embeds = messageObject.embeds.length > 0;
     let embedDivs = document.createElement("div");
+    embedDivs.id = `embeds-${msgId}`;
     if (embeds) {
       messageObject.embeds.forEach(async (embed) => {
         if (embed.media) {
@@ -520,7 +573,7 @@ async function buildMessage(message, type) {
       copyMsg.innerHTML = "Copy Text <img src='/media/image/icons/copy.png' />";
       copyMsg.onclick = () => {
         const unparsed = document.getElementById(`unparsed-${msgId}`);
-        if (unparsed) copyText(text);
+        if (unparsed) copyText(unparsed.value);
         else popup("Failed to copy text");
         if (document.querySelector("html.mobile")) {
           menu.style.bottom = "-100%";
@@ -726,7 +779,7 @@ function sendToClients(json) {
 }
 
 function replyMessage(id, auth) {
-  document.getElementById("msginp").value = "";
+  mainInput.textContent = "";
   inputData.type = "reply";
   inputData.id = id;
   const inputType = document.createElement("div");
@@ -753,11 +806,10 @@ function deleteMessage(id) {
 }
 
 function editMessage(id) {
-  const msgInput = document.getElementById("msginp");
   const prevType = document.getElementById("inputType");
   if (prevType) prevType.remove();
-  msgInput.value = document.getElementById(`unparsed-${id}`).value;
-  if (!msgInput.value) msgInput.focus();
+  mainInput.textContent = document.getElementById(`unparsed-${id}`).value;
+  if (!mainInput.textContent) mainInput.focus();
   inputData.type = "edit";
   inputData.id = id;
   const inputType = document.createElement("div");
@@ -781,7 +833,7 @@ function removeInputType() {
   }
   inputData.type = "message";
   inputData.id = null;
-  document.getElementById("msginp").value = "";
+  mainInput.textContent = "";
 }
 
 function uploadMedia() {
@@ -806,8 +858,49 @@ function uploadMedia() {
   };
 }
 
+let changed = false;
 setInterval(() => {
-  mainInput.focus();
-  const lines = mainInput.value.split("\n").length;
-  mainInput.style.height = 20 * lines + "px";
+  const messages = [
+    "Send a message...",
+    "Message chat...",
+    "Type a message...",
+    "Talk to your gang...",
+    "Message your friends...",
+    "Talk to your friends...",
+    "Message your gang...",
+    "Be silly in chat...",
+    "Tell everyone your sigma...",
+    "Ask about the history of cheese...",
+    "Meow mrrp mew...",
+    "Meow for chat...",
+    "Talk to your pookies...",
+    // Refrences
+    "Discuss the great turf war...", // Splatoon
+    "Beep bop bep skdep...", // FNF
+    "Get dunked on...", // Undertale
+    "Talk about the bite of '87", // FNAF
+    "Steal the diamond...", // Henry Stickmin
+    "Defeat the ender dragon...", // Minecraft
+    "Accuse red of being imposter...", // Among Us
+    "Go to somewhere in Navada...", // Madness Combat
+    "Learn about apples and bananas...", // Pico's School
+    "Find out who's laughing now...", // BATIM
+    "Boy...", // God of War
+    "Keep fighting the darkness...", // Sally Face
+    "Make a cock joke...", // Tankmen
+  ];
+  if (mainInput.textContent && mainInput.textContent.trim() !== "") {
+    if (changed) {
+      mainInput.removeAttribute("placeholder");
+      changed = false;
+    }
+  } else {
+    if (!changed) {
+      mainInput.setAttribute(
+        "placeholder",
+        messages[Math.floor(Math.random() * messages.length)],
+      );
+      changed = true;
+    }
+  }
 });
