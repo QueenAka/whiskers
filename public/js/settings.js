@@ -224,8 +224,8 @@ const contextObj = {
   },
   reconnectPopups: {
     type: "text",
-    title: "Reconnect Popups",
-    body: "Enable or disable weither popups are shown when you are reconnected to a chat",
+    title: "Error Popups",
+    body: "Enable or disable weither popups are shown when a client side error occurs",
   },
   displayIds: {
     type: "text",

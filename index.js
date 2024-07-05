@@ -338,6 +338,21 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
   }, 60000);
 });
 
+app.get("/.well-known/assetlinks.json", (req, res) => {
+  res.json([
+    {
+      relation: ["delegate_permission/common.handle_all_urls"],
+      target: {
+        namespace: "android_app",
+        package_name: "co.median.android.plqwxx",
+        sha256_cert_fingerprints: [
+          "25:B6:31:39:96:87:CF:F9:6D:CD:5A:B8:4A:E4:38:E2:2D:09:AA:FF:9D:66:23:14:E4:EB:FF:37:9F:45:70:AE",
+        ],
+      },
+    },
+  ]);
+});
+
 // Server config
 
 app.use((req, res) => {

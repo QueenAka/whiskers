@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Whiskers | Credits</title>
+    <link rel="icon" type="image/png" href="/media/image/icons/logo.png" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="og:title" content="Whiskers | Credits" />
+    <meta
+      name="og:description"
+      content="Find out about all the awesome people who helped make Whiskers what it is now!"
+    />
+    <meta name="og:image" content="/media/image/icons/logo.png" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <load>
+      <img src="/media/image/icons/logo.png" />
+    </load>
+    <nav>
+      <a id="home" href="/" title="Home">
+        <img src="/media/image/icons/logo.png" />
+        Whiskers
+      </a>
+      <div>
+        <img
+          src="/media/image/icons/github.png"
+          onclick='goto("https://github.com/QueenAka/whiskers")'
+          title="Source Code"
+        />
+        <img
+          src="/media/image/icons/downloads.png"
+          onclick='goto("/pages/downloads")'
+          title="Downloads"
+        />
+        <img
+          src="/media/image/icons/credits.png"
+          onclick='goto("/pages/credits")'
+          title="Credits"
+        />
+        <img
+          src="/media/image/icons/settings.png"
+          onclick="goto('/pages/settings')"
+          title="Settings"
+        />
+        <img
+          src="/media/image/icons/profile.png"
+          id="profileNav"
+          title="You"
+          onclick="goto('/pages/settings')"
+        />
+      </div>
+    </nav>
+    <div class="cards opts">
+      <div class="chat-card">
+        <div class="head">
+          <img src="/media/image/icons/android.png" />
+          <h3>Android</h3>
+        </div>
+        <p>
+          Whiskers Official Android mobile app, works with any Android version
+          10 and up
+        </p>
+        <div class="buttons">
+          <div class="right">
+            <button onclick="downloadApk()">Download APK</button>
+          </div>
+        </div>
+      </div>
+      <div class="chat-card">
+        <div class="head">
+          <img src="/media/image/icons/windows.png" />
+          <h3>Windows 10 and 11</h3>
+        </div>
+        <p>
+          Whiskers Official Windows desktop app, works with Windows 10 and 11
+        </p>
+        <div class="buttons">
+          <div class="right">
+            <button onclick="downloadExe()">Download EXE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/js/all.js"></script>
+    <script>
+      function downloadApk() {
+        const a = document.createElement("a");
+        a.href = "/media/file/whiskers.apk";
+        a.download = "whiskers.apk";
+        a.click();
+      }
+
+      function downloadExe() {
+        const a = document.createElement("a");
+        a.href = "/media/file/whiskers.exe";
+        a.download = "whiskers.exe";
+        a.click();
+      }
+    </script>
+  </body>
+</html>

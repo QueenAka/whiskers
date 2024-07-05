@@ -344,6 +344,7 @@ function download(str, format, name = "download") {
     zip: "application/zip",
     rar: "application/x-rar-compressed",
     exe: "application/octet-stream",
+    apk: "application/vnd.android.package-archive",
   };
 
   let mimeType;

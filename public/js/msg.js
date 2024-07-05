@@ -14,6 +14,10 @@ let loadingMessages = [];
 let msgTimeout = setTimeout(() => {
   lastUser = null;
 }, 60000);
+let canMessage = true;
+let msgTimeoutSend = setTimeout(() => {
+  canMessage = true;
+}, 1000);
 mainInput.addEventListener("keydown", (e) => {
   const isMobile = document.querySelector("html.mobile");
   function addSymbol(s) {
@@ -80,6 +84,7 @@ function highlight(id) {
 }
 
 async function emojiList() {
+  focusMainInput();
   return new Promise(async (resolve) => {
     if (emojiOpened == false) {
       emojiOpened = true;
@@ -120,6 +125,7 @@ async function emojiList() {
 
 function loadEmojisBar() {
   if (!emojiOpened) return;
+  focusMainInput();
   const emojisIcon = document.getElementById("emojisIcon");
   const gifsIcon = document.getElementById("gifsIcon");
   const imagesIcon = document.getElementById("imagesIcon");
@@ -145,6 +151,7 @@ function loadGifsBar() {
   content.innerHTML =
     "<input id='gifSearch'><div id='searchContent' class='img-holder'><p class='lt' style='text-align: center;'>Search for a GIF</p></div>";
   const search = document.getElementById("gifSearch");
+  search.focus();
   search.addEventListener("keydown", (e) => {
     if (e.key == "Enter") {
       tenorSearch(search.value, 0);
@@ -212,6 +219,7 @@ function loadImagesBar() {
   content.innerHTML =
     "<input id='imageSearch'><div id='searchContent' class='img-holder'><p class='lt' style='text-align: center;'>Search for an image</p></div>";
   const search = document.getElementById("imageSearch");
+  search.focus();
   search.addEventListener("keydown", (e) => {
     if (e.key == "Enter") {
       imgurSearch(search.value, 1);
@@ -220,6 +228,7 @@ function loadImagesBar() {
 }
 
 function emojiClick(name) {
+  focusMainInput();
   mainInput.textContent += ":" + name + ":";
 }
 
@@ -230,9 +239,16 @@ function removeReply(msg) {
 }
 
 function send() {
+  focusMainInput();
   const msg = mainInput.textContent;
   if (msg.trim().length < 1) return;
   if (msg.trim().length > 2000) return popup("Message too long!");
+  if (!canMessage) return popup("You're messaging too fast! Slow down!!");
+  canMessage = false;
+  clearTimeout(msgTimeoutSend);
+  msgTimeoutSend = setTimeout(() => {
+    canMessage = true;
+  }, 1000);
   mainInput.textContent = "";
   let json;
   if (inputData.type == "reply") {
@@ -779,7 +795,7 @@ function sendToClients(json) {
 }
 
 function replyMessage(id, auth) {
-  mainInput.textContent = "";
+  focusMainInput();
   inputData.type = "reply";
   inputData.id = id;
   const inputType = document.createElement("div");
@@ -806,6 +822,7 @@ function deleteMessage(id) {
 }
 
 function editMessage(id) {
+  focusMainInput();
   const prevType = document.getElementById("inputType");
   if (prevType) prevType.remove();
   mainInput.textContent = document.getElementById(`unparsed-${id}`).value;
@@ -824,6 +841,7 @@ function editMessage(id) {
 }
 
 function removeInputType() {
+  focusMainInput();
   const inputType = document.querySelector(".input-type");
   if (inputType) {
     inputType.style.opacity = 0;
@@ -833,7 +851,6 @@ function removeInputType() {
   }
   inputData.type = "message";
   inputData.id = null;
-  mainInput.textContent = "";
 }
 
 function uploadMedia() {
@@ -853,6 +870,7 @@ function uploadMedia() {
           popup(data.error);
         } else {
           sendTxt(`https://${urlObj.host}/media/uploads/${data.url}`);
+          focusMainInput();
         }
       });
   };
@@ -918,3 +936,12 @@ fetch(`/api/chats/${chatId}`)
   .then((data) => {
     document.title = `Whiskers | ${data.name}`;
   });
+
+function focusMainInput() {
+  mainInput.focus();
+}
+
+window.onerror = (msg, url, lineNo, columnNo, error) => {
+  console.log(msg, url, lineNo, columnNo, error);
+  if (s.advanced.reconnectPopups) popup(msg);
+};
