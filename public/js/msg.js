@@ -160,6 +160,7 @@ function loadGifsBar() {
 }
 
 function imgurSearch(q, next) {
+  focusMainInput();
   const search = document.getElementById("imageSearch");
   const searchContent = document.getElementById("searchContent");
   if (q.trim() == "") return;
@@ -180,10 +181,12 @@ function imgurSearch(q, next) {
       if (data.images.length != 0)
         searchContent.innerHTML += `<button onclick="imgurSearch('${q}', ${data.next})">Next Page</button>`;
       search.removeAttribute("disabled");
+      search.focus();
     });
 }
 
 function tenorSearch(q, next) {
+  focusMainInput();
   const search = document.getElementById("gifSearch");
   const searchContent = document.getElementById("searchContent");
   if (q.trim() == "") return;
@@ -204,6 +207,7 @@ function tenorSearch(q, next) {
       if (data.results.length != 0)
         searchContent.innerHTML += `<button onclick="tenorSearch('${q}', '${data.next}')">Next Page</button>`;
       search.removeAttribute("disabled");
+      search.focus();
     });
 }
 
