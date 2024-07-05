@@ -377,7 +377,7 @@ async function messageReceiver(event) {
     messageObject.message = clean(data.content);
     messageObject.embeds = [];
     if (s.general.messageEmbeds)
-      messageObject = await format(messageData.content, true);
+      messageObject = await format(data.content, true);
     const embeds = messageObject.embeds;
     if (embeds) {
       messageObject.embeds.forEach(async (embed) => {
@@ -874,22 +874,28 @@ setInterval(() => {
     "Meow mrrp mew...",
     "Meow for chat...",
     "Talk to your pookies...",
-    // Refrences
     "Discuss the great turf war...", // Splatoon
     "Beep bop bep skdep...", // FNF
-    "Get dunked on...", // Undertale
-    "Talk about the bite of '87", // FNAF
-    "Steal the diamond...", // Henry Stickmin
+    "Ask how the fall was...", // Undertale
+    "Talk about the bite of '87...", // FNAF
+    "Infiltrate the airship...", // Henry Stickmin
     "Defeat the ender dragon...", // Minecraft
     "Accuse red of being imposter...", // Among Us
-    "Go to somewhere in Navada...", // Madness Combat
+    "Go to somewhere in Nevada...", // Madness Combat
     "Learn about apples and bananas...", // Pico's School
     "Find out who's laughing now...", // BATIM
-    "Boy...", // God of War
+    "Dont mistake silence for lack of grief...", // God of War
     "Keep fighting the darkness...", // Sally Face
     "Make a cock joke...", // Tankmen
+    "Hand over your pancreas...", // GOBB
+    "Watch smiling critters...", // Poppy Playtime
+    "Crank 90's on your friends...", // Fortnite
+    "Find that damn fourth chaos emerald...", // Sonic the Hedgehog
+    "Play as Luigi...", // Super Mario
+    "Make a joke about his fat mom...", // Helluva Boss
+    "Have a swell battle...", // Cuphead
   ];
-  if (mainInput.textContent && mainInput.textContent.trim() !== "") {
+  if (mainInput.textContent && mainInput.textContent !== "") {
     if (changed) {
       mainInput.removeAttribute("placeholder");
       changed = false;
@@ -904,3 +910,11 @@ setInterval(() => {
     }
   }
 });
+
+const chatId = url.split("/").pop();
+console.log(chatId);
+fetch(`/api/chats/${chatId}`)
+  .then((res) => res.json())
+  .then((data) => {
+    document.title = `Whiskers | ${data.name}`;
+  });

@@ -252,8 +252,9 @@ app.get("/api/chats/:chatId", async (req, res) => {
   let data = JSON.parse(
     fs.readFileSync(path.join(__dirname, "private/data/chats.json"), "utf-8"),
   );
-  if (!data[chatId]) return res.status(404).json({ error: "Chat not found" });
-  res.json(data[chatId]);
+  const chat = data.find((c) => c.id === chatId);
+  if (!chat) return res.status(404).json({ error: "Chat not found" });
+  res.json(chat);
 });
 
 app.get("/chats/:chatId", async (req, res) => {

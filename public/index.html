@@ -6,7 +6,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="og:title" content="Whiskers" />
-    <meta name="og:description" content="Whiskers - Super Secret Messaging" />
     <meta name="og:image" content="/media/image/icons/logo.png" />
     <link rel="stylesheet" href="/css/style.css" />
   </head>
@@ -15,23 +14,39 @@
       <img src="/media/image/icons/logo.png" />
     </load>
     <nav>
-      <img src="/media/image/icons/profile.png" id="profileNav" />
-      <a id="home" href="/">
+      <a id="home" href="/" title="Home">
         <img src="/media/image/icons/logo.png" />
         Whiskers
       </a>
-      <img
-        onclick="goto('/pages/settings')"
-        src="/media/image/icons/settings.png"
-      />
+      <div>
+        <img
+          src="/media/image/icons/github.png"
+          onclick='goto("https://github.com/QueenAka/whiskers")'
+          title="Source Code"
+        />
+        <img
+          src="/media/image/icons/downloads.png"
+          onclick='goto("/pages/downloads")'
+          title="Downloads"
+        />
+        <img
+          src="/media/image/icons/credits.png"
+          onclick='goto("/pages/credits")'
+          title="Credits"
+        />
+        <img
+          src="/media/image/icons/settings.png"
+          onclick="goto('/pages/settings')"
+          title="Settings"
+        />
+        <img
+          src="/media/image/icons/profile.png"
+          id="profileNav"
+          title="You"
+          onclick="goto('/pages/settings')"
+        />
+      </div>
     </nav>
-    <footer>
-      <a href="/">Home</a>
-      <a href="/pages/settings">Settings</a>
-      <a href="https://github.com/QueenAka/whiskers">Source Code</a>
-      <a href="/pages/downloads">Downloads</a>
-      <a href="/pages/credits">Credits</a>
-    </footer>
     <div class="tabs">
       <div
         class="tab active"

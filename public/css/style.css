@@ -193,6 +193,18 @@ nav {
   padding: 0 5px;
 }
 
+nav div {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+nav div img {
+  margin: 0 10px;
+  cursor: pointer;
+}
+
 .desktopApp nav {
   top: 30px;
 }
@@ -590,7 +602,7 @@ reply {
   width: 500px;
   height: calc(100% - 90px);
   position: absolute;
-  top: 115px;
+  top: 82px;
   left: 50%;
   transform: translateX(-50%);
   padding: 0 5px;
@@ -601,7 +613,7 @@ reply {
 }
 
 .desktopApp .cards {
-  top: 155px;
+  top: 112px;
   height: calc(100% - 120px);
 }
 
@@ -680,7 +692,7 @@ reply {
 
 .tabs {
   position: fixed;
-  top: 80px;
+  top: 50px;
   left: 0;
   width: 100%;
   height: 30px;
@@ -692,7 +704,7 @@ reply {
 }
 
 .desktopApp .tabs {
-  top: 110px;
+  top: 80px;
 }
 
 .tab {
@@ -1052,33 +1064,6 @@ load img {
   margin-top: 5px;
 }
 
-footer {
-  background: var(--background);
-  position: fixed;
-  top: 50px;
-  left: 0;
-  width: 100%;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  z-index: 999;
-}
-
-footer a {
-  text-decoration: none;
-  font-size: 18px;
-  width: calc(100% / 5);
-  text-align: center;
-  display: inline-block;
-  height: 30px;
-  line-height: 30px;
-  color: var(--text);
-}
-
-.desktopApp footer {
-  top: 80px;
-}
-
 #account {
   padding-top: 55px;
 }
@@ -1262,4 +1247,9 @@ input:checked + .slider:before {
 
 .cards.opts {
   top: 50px;
+}
+
+.plain {
+  color: var(--text);
+  text-decoration: none;
 }
