@@ -3,12 +3,11 @@ function select(id) {
     "tab-news",
     "tab-publicChats",
     "tab-joinChat",
-    "tab-createChat",
   ];
   tabs.forEach((tabId) =>
     document.getElementById(tabId).classList.remove("active"),
   );
-  const contentIds = ["news", "publicChats", "joinChat", "createChat"];
+  const contentIds = ["news", "publicChats", "joinChat"];
   contentIds.forEach(
     (contentId) => (document.getElementById(contentId).style.display = "none"),
   );

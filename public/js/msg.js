@@ -938,7 +938,7 @@ console.log(chatId);
 fetch(`/api/chats/${chatId}`)
   .then((res) => res.json())
   .then((data) => {
-    document.title = `Whiskers | ${data.name}`;
+    document.title = `Whiskers | ${data.name || chatId}`;
   });
 
 function focusMainInput() {

@@ -708,7 +708,7 @@ reply {
 }
 
 .tab {
-  width: 25%;
+  width: calc(100% / 3);
   height: 27px;
   background: var(--background);
   font-size: 20px;

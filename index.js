@@ -210,29 +210,6 @@ app.post("/events/post", (req, res) => {
 });
 
 // Chats
-app.post("/api/new", async (req, res) => {
-  let author = req.body.username;
-  let name = req.body.chatName;
-
-  const allChats = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/chats.json")),
-  );
-
-  let chatId = Math.floor(Math.random() * 100000000000000);
-  allChats[chatId] = {
-    author: author,
-    name: name,
-  };
-  fs.writeFileSync(
-    path.join(__dirname, "private/data/chats.json"),
-    JSON.stringify(allChats),
-  );
-  res.json({
-    res: "Success",
-    chatId: chatId,
-  });
-});
-
 app.get("/api/chats", async (req, res) => {
   const chats = JSON.parse(
     fs.readFileSync(path.join(__dirname, "private/data/chats.json"), "utf-8"),
@@ -260,16 +237,6 @@ app.get("/api/chats/:chatId", async (req, res) => {
 app.get("/chats/:chatId", async (req, res) => {
   let chatId = req.params.chatId;
   if (!chatId) return res.redirect("/");
-  let chats = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "private/data/chats.json")),
-  );
-  const chat = chats.find((c) => c.id === chatId);
-  if (!chat)
-    return res
-      .status(404)
-      .sendFile(path.join(__dirname, "private/html/404.html"));
-  if (chat.visibility.type == "private")
-    return res.status(403).redirect(`/chats/auth/${chatId}`);
   res.sendFile(path.join(__dirname, "private/html/chat.html"));
 });
 
