@@ -1270,3 +1270,10 @@ input:checked + .slider:before {
   margin-right: 5px;
   display: inline-block;
 }
+
+.spoiler {
+  color: var(--text) !important;
+  background: var(--text);
+  cursor: pointer;
+  border-radius: 2px;
+}

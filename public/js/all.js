@@ -77,7 +77,8 @@ async function format(msg, embeds) {
   const boldRegex = /\*\*(.*?)\*\*/g;
   const strikethroughRegex = /~~(.*?)~~/g;
   const underlineRegex = /__(.*?)__/g;
-  const userRegex = /@([a-zA-Z0-9_]+)\b/g;
+  const colorRegex = /#([A-Fa-f0-9]{6})\((.*?)\)/g;
+  const spoilerRegex = /\|\|(.*?)\|\|/g;
   let builtEmbeds = [];
 
   msg = msg
@@ -116,11 +117,11 @@ async function format(msg, embeds) {
         )}</reply></a>`;
       }
     })
-    .replace(userRegex, function (match) {
-      let username = match.replace("@", "");
-      const href = `<a href="/user/${username}" target="_blank" rel="noopener noreferrer">${match}</a>`;
-      return href;
-    })
+    .replace(colorRegex, "<span style='color:#$1'>$2</span>")
+    .replace(
+      spoilerRegex,
+      "<span class='spoiler' onclick='toggleSpoil(this)'>$1</span>",
+    )
     .replace(/\n/g, "<br>");
 
   if (embeds) {
@@ -186,7 +187,8 @@ function clean(msg) {
   const boldRegex = /\*\*(.*?)\*\*/g;
   const strikethroughRegex = /~~(.*?)~~/g;
   const underlineRegex = /_(.*?)_/g;
-  const userRegex = /@([a-zA-Z0-9_]+)\b/g;
+  const colorRegex = /#([A-Fa-f0-9]{6})\((.*?)\)/g;
+  const spoilerRegex = /\|\|(.*?)\|\|/g;
   msg = msg
     .trim()
     .replace(/</g, "&lt;")
@@ -211,11 +213,11 @@ function clean(msg) {
     .replace(italicsRegex, "<i>$1</i>")
     .replace(strikethroughRegex, "<s>$1</s>")
     .replace(underlineRegex, "<u>$1</u>")
-    .replace(userRegex, function (match) {
-      let username = match.replace("@", "");
-      const href = `<a href="/user/${username}" target="_blank" rel="noopener noreferrer">${match}</a>`;
-      return href;
-    })
+    .replace(colorRegex, "<span style='color:#$1'>$2</span>")
+    .replace(
+      spoilerRegex,
+      "<span class='spoiler' onclick='toggleSpoil(this)'>$1</span>",
+    )
     .replace(/\n/g, "<br>");
 
   return msg;
@@ -364,4 +366,8 @@ function download(str, format, name = "download") {
   document.body.appendChild(el);
   el.click();
   document.body.removeChild(el);
+}
+
+function toggleSpoil(el) {
+  el.classList.toggle("spoiler");
 }
