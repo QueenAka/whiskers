@@ -79,6 +79,8 @@ async function format(msg, embeds) {
   const underlineRegex = /__(.*?)__/g;
   const colorRegex = /#([A-Fa-f0-9]{6})\((.*?)\)/g;
   const spoilerRegex = /\|\|(.*?)\|\|/g;
+  const contextRegex = /\$(.*?)\((.*?)\)/g;
+  const codeBlockRegex = /```(.*?)\n([\s\S]*?)\n```/g;
   let builtEmbeds = [];
 
   msg = msg
@@ -96,7 +98,6 @@ async function format(msg, embeds) {
         return `<img class="emoji" src="${emoji.url}" alt="${emoji.name}">`;
       return name;
     })
-    .replace(codeRegex, `<code>$1</code>`)
     .replace(linkRegex, function (url) {
       const cleanUrl = url.replace(/^([^:]*):/, "$1://");
       return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${url}</a>`;
@@ -122,7 +123,18 @@ async function format(msg, embeds) {
       spoilerRegex,
       "<span class='spoiler' onclick='toggleSpoil(this)'>$1</span>",
     )
-    .replace(/\n/g, "<br>");
+    .replace(
+      contextRegex,
+      "$2<span class='lt sp-l' title='$1' onclick='popup(this.title)'>(Alt)</span>",
+    )
+    .replace(codeBlockRegex, function (match, lang, code) {
+      if (lang.toLowerCase() == "html") {
+        return `<pre title="Open in New Tab"><code onclick="openHtml(this.textContent)" class="code-style lang-${lang.toLowerCase()}">${code}</code></pre>`;
+      } else {
+        return `<pre><code class="code-style lang-${lang.toLowerCase()}">${code}</code></pre>`;
+      }
+    })
+    .replace(codeRegex, `<code>$1</code>`);
 
   if (embeds) {
     links = msg.match(linkRegex);
@@ -189,6 +201,8 @@ function clean(msg) {
   const underlineRegex = /_(.*?)_/g;
   const colorRegex = /#([A-Fa-f0-9]{6})\((.*?)\)/g;
   const spoilerRegex = /\|\|(.*?)\|\|/g;
+  const contextRegex = /\$(.*?)\((.*?)\)/g;
+  const codeBlockRegex = /```(.*?)\n([\s\S]*?)\n```/g;
   msg = msg
     .trim()
     .replace(/</g, "&lt;")
@@ -204,7 +218,6 @@ function clean(msg) {
         return `<img class="emoji" src="${emoji.url}" alt="${emoji.name}">`;
       return name;
     })
-    .replace(codeRegex, `<code>$1</code>`)
     .replace(linkRegex, function (url) {
       const cleanUrl = url.replace(/^([^:]*):/, "$1://");
       return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${url}</a>`;
@@ -218,7 +231,12 @@ function clean(msg) {
       spoilerRegex,
       "<span class='spoiler' onclick='toggleSpoil(this)'>$1</span>",
     )
-    .replace(/\n/g, "<br>");
+    .replace(
+      contextRegex,
+      "$2<span class='lt sp-l' title='$1' onclick='popup(this.title)'>(Alt)</span>",
+    )
+    .replace(codeBlockRegex, "<pre><code lang='$1'>$2</code></pre>")
+    .replace(codeRegex, `<code>$1</code>`);
 
   return msg;
 }

@@ -244,7 +244,14 @@ function removeReply(msg) {
 
 function send() {
   focusMainInput();
-  const msg = mainInput.textContent;
+  const msg = mainInput.innerHTML
+    .replace(/<br>/g, "\n")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&nbsp;/g, " ");
   if (msg.trim().length < 1) return;
   if (msg.trim().length > 2000) return popup("Message too long!");
   if (!canMessage) return popup("You're messaging too fast! Slow down!!");
@@ -385,6 +392,8 @@ async function messageReceiver(event) {
     unparsed.value = `[DELETED]`;
     content.id = `deleted-content-${id}`;
     unparsed.id = `deleted-unparsed-${id}`;
+    const embedDivs = document.getElementById(`embeds-${id}`);
+    embedDivs.innerHTML = "";
   } else if (message.type == "messageEdit") {
     const data = JSON.parse(message.data);
     const id = data.id;
@@ -508,8 +517,8 @@ async function buildMessage(message, type) {
     authorSpan.style.color = nameColor || "white";
 
     const dateSpan = document.createElement("span");
-    dateSpan.classList.add("lt");
-    dateSpan.innerHTML = ` ${formateDate(new Date())}`;
+    dateSpan.classList = "lt sp-l";
+    dateSpan.innerHTML = formateDate(new Date());
 
     const unparsed = document.createElement("textarea");
     unparsed.style.display = "none";
@@ -524,7 +533,7 @@ async function buildMessage(message, type) {
 
     if (appendUser) msgDiv.appendChild(topDiv);
 
-    const bottomSpan = document.createElement("span");
+    const bottomSpan = document.createElement("div");
     bottomSpan.classList.add("messageContent");
     bottomSpan.id = `content-${msgId}`;
     bottomSpan.innerHTML = messageObject.message;
@@ -772,7 +781,7 @@ async function buildMessage(message, type) {
 
     if (appendUser) msgDiv.appendChild(topDiv);
 
-    const bottomSpan = document.createElement("span");
+    const bottomSpan = document.createElement("div");
     bottomSpan.classList.add("messageContent");
     bottomSpan.id = `content-${msgId}`;
     bottomSpan.innerHTML = messageObject.message;
@@ -949,3 +958,8 @@ window.onerror = (msg, url, lineNo, columnNo, error) => {
   console.log(msg, url, lineNo, columnNo, error);
   if (s.advanced.reconnectPopups) popup(msg);
 };
+
+function openHtml(code) {
+  const win = window.open();
+  win.document.write(code);
+}
