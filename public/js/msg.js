@@ -963,3 +963,8 @@ function openHtml(code) {
   const win = window.open();
   win.document.write(code);
 }
+
+function openJs(code) {
+  const win = window.open();
+  win.document.write(`<script>${code}</script>`);
+}

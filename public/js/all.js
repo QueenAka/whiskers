@@ -85,8 +85,12 @@ async function format(msg, embeds) {
 
   msg = msg
     .trim()
+    .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;")
+
     .replace(headerRegex, function (match, p1, p2) {
       let level = p1.length;
       let tag = `<h${level}>${p2}</h${level}>`;
@@ -134,7 +138,19 @@ async function format(msg, embeds) {
         return `<pre><code class="code-style lang-${lang.toLowerCase()}">${code}</code></pre>`;
       }
     })
-    .replace(codeRegex, `<code>$1</code>`);
+    .replace(codeRegex, `<code>$1</code>`)
+    .replace(codeBlockRegex, function (match, lang, content) {
+      if (lang.toLowerCase() == "html") {
+        return `<pre title="Open in New Tab"><code onclick="openHtml(this.textContent)" class="code-style lang-html">${content}</code></pre>`;
+      } else if (
+        lang.toLowerCase() == "js" ||
+        lang.toLowerCase() == "javascript"
+      ) {
+        return `<pre title="Open in New Tab"><code onclick="openJs(this.textContent)" class="code-style lang-js">${content}</code></pre>`;
+      } else {
+        return `<pre><code class="code-style lang-${lang.toLowerCase()}">${content}</code></pre>`;
+      }
+    });
 
   if (embeds) {
     links = msg.match(linkRegex);
@@ -205,8 +221,11 @@ function clean(msg) {
   const codeBlockRegex = /```(.*?)\n([\s\S]*?)\n```/g;
   msg = msg
     .trim()
+    .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;")
     .replace(headerRegex, function (match, p1, p2) {
       let level = p1.length;
       let tag = `<h${level}>${p2}</h${level}>`;
@@ -235,7 +254,10 @@ function clean(msg) {
       contextRegex,
       "$2<span class='lt sp-l' title='$1' onclick='popup(this.title)'>(Alt)</span>",
     )
-    .replace(codeBlockRegex, "<pre><code lang='$1'>$2</code></pre>")
+    .replace(
+      codeBlockRegex,
+      "<pre><code class='code-style lang-$1'>$2</code></pre>",
+    )
     .replace(codeRegex, `<code>$1</code>`);
 
   return msg;

@@ -4,14 +4,7 @@ setInterval(() => {
 	https://prismjs.com/download.html#themes=prism-tomorrow&languages=markup+css+clike+javascript */
 	/// <reference lib="WebWorker"/>
 
-	var _self = (typeof window !== 'undefined')
-		? window   // if in browser
-		: (
-			(typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope)
-				? self // if in worker
-				: {}   // if in node js
-		);
-
+	var _self = window
 	/**
 	 * Prism: Lightweight, robust, elegant syntax highlighting
 	 *
