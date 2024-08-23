@@ -149,7 +149,7 @@ function loadGifsBar() {
   imagesIcon.classList.remove("on");
   const content = document.getElementById("emojiContent");
   content.innerHTML =
-    "<input id='gifSearch'><div id='searchContent' class='img-holder'><p class='lt' style='text-align: center;'>Search for a GIF</p></div>";
+    "<input id='gifSearch'><div id='searchContent' class='img-holder'><p class='lt' style='text-align: center;'>Search Tenor for a GIF</p></div>";
   const search = document.getElementById("gifSearch");
   search.focus();
   search.addEventListener("keydown", (e) => {
@@ -221,7 +221,7 @@ function loadImagesBar() {
   gifsIcon.classList.remove("on");
   const content = document.getElementById("emojiContent");
   content.innerHTML =
-    "<input id='imageSearch'><div id='searchContent' class='img-holder'><p class='lt' style='text-align: center;'>Search for an image</p></div>";
+    "<input id='imageSearch'><div id='searchContent' class='img-holder'><p class='lt' style='text-align: center;'>Search Imgur for an image</p></div>";
   const search = document.getElementById("imageSearch");
   search.focus();
   search.addEventListener("keydown", (e) => {

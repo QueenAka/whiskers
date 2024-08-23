@@ -88,7 +88,7 @@
   --text: #F1F1F1;
   --light-text: #AAAAAA;
   --background: #131517;
-  --highlights: #4f3c2f;
+  --highlights: #6f4e37;
   --warn: #E6D581;
   --success: #5BBD5B;
   --danger: #E60B42;
@@ -180,7 +180,7 @@ input[type=text]:focus, input[type=password]:focus {
 nav {
   height: 50px;
   width: calc(100% - 10px);
-  background-color: var(--highlights);
+  background: var(--highlights);
   position: fixed;
   top: 0;
   left: 0;
