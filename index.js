@@ -320,6 +320,10 @@ app.get("/.well-known/assetlinks.json", (req, res) => {
   ]);
 });
 
+app.get("/.well-known/discord", (req, res) => {
+  res.send("dh=f9c5ad6a2b340aa84555e8161198236e7433b67b");
+});
+
 // Server config
 
 app.use((req, res) => {
