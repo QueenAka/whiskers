@@ -87,8 +87,8 @@
 }
 
 :root[theme="icecream"], .user-popup[theme="icecream"] {
-  --main: linear-gradient(45deg, #ffb9e8 0%, #ffd8f5 100%);
-  --highlights: #ffaae3;
+  --main: linear-gradient(45deg, #ffd8f5 0%, #8b7e80 90%, #5a5c67 100%);
+  --highlights: #ffd8f5;
   --secondary: #534a4c;
   --background: #403a3b;
 }
