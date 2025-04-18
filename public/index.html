@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Whiskers</title>
+    <link rel="icon" type="image/png" href="/media/image/icons/logo.png" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="og:title" content="Whiskers" />
+    <meta name="og:image" content="/media/image/icons/logo.png" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="/js/theme.js"></script>
+  </head>
+  <body>
+    <nav>
+      <a id="home" href="/" title="Home">
+        <btn style="--img: url(/media/image/icons/logo.png)"></btn>
+        Whiskers
+      </a>
+      <div>
+        <btn
+          style="--img: url(/media/image/icons/github.png)"
+          onclick='goto("https://github.com/QueenAka/whiskers")'
+          title="Source Code"></btn>
+        <btn
+          style="--img: url(/media/image/icons/downloads.png)"
+          onclick='goto("/pages/downloads")'
+          title="Downloads"></btn>
+        <btn
+          style="--img: url(/media/image/icons/license.png)"
+          onclick='goto("/pages/license")'
+          title="License and Agreements"></btn>
+        <btn
+          style="--img: url(/media/image/icons/settings.png)"
+          onclick="goto('/pages/settings')"
+          title="Settings"></btn>
+        <pfp title="You" onclick="goto('/pages/settings')">
+          <img src="/media/image/icons/profile.png" id="profileNav" />
+        </pfp>
+      </div>
+    </nav>
+    <div class="tabs">
+      <div
+        class="tab active"
+        id="tab-news"
+        onclick="select(this.id.split('-')[1])">
+        News
+      </div>
+      <div
+        class="tab"
+        id="tab-publicChats"
+        onclick="select(this.id.split('-')[1])">
+        Public
+      </div>
+      <div
+        class="tab"
+        id="tab-joinChat"
+        onclick="select(this.id.split('-')[1])">
+        Join
+      </div>
+    </div>
+    <div id="news" class="cards"></div>
+    <div id="publicChats" class="cards" style="display: none"></div>
+    <div id="joinChat" style="display: none" class="cards">
+      <div class="chat-card">
+        <div class="head">
+          <h3 class="name">Join a Chat</h3>
+        </div>
+        <div class="buttons">
+          <div class="left">
+            <input
+              placeholder="Chat ID"
+              id="joinChatId"
+              type="text"
+              style="margin: 0" />
+          </div>
+          <div class="right">
+            <button
+              onclick="goto(`/chats/${document.getElementById('joinChatId').value}`)">
+              Join
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/js/all.js"></script>
+    <script src="/js/home.js"></script>
+  </body>
+</html>
